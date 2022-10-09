@@ -1,0 +1,20 @@
+Description: removes -funroll-loops (FTBFS in arm)
+ It will be conditionally set in debian/rules
+Author: David Paleino <d.paleino@gmail.com>
+Reviewed-By: Ruben Molina <rmolina@udea.edu.co>
+Bug-Debian: http://bugs.debian.org/476460
+Last-Update: 2013-06-04
+Forwarded: no
+
+Index: john-1.8.0/src/Makefile
+===================================================================
+--- john-1.8.0.orig/src/Makefile	2013-06-04 01:19:37.244046143 -0500
++++ john-1.8.0/src/Makefile	2013-06-04 01:19:38.876046194 -0500
+@@ -33,7 +33,6 @@
+ CFLAGS_MAIN = $(CFLAGS)
+ ASFLAGS = -c $(OMPFLAGS)
+ LDFLAGS += -s $(OMPFLAGS)
+-OPT_NORMAL = -funroll-loops
+ # Remove the "-Os" if you're using an ancient version of gcc
+ OPT_INLINE = -Os -funroll-loops -finline-functions
+ 

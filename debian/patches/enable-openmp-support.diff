@@ -1,0 +1,20 @@
+Description: Enable OpenMP support
+Origin: https://www.openwall.com/john/doc/
+Forwarded: not-needed
+Author: Axel Beckert <abe@debian.org>
+Bug-Debian: https://bugs.debian.org/824107
+
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -19,9 +19,9 @@
+ SED = sed
+ NULL = /dev/null
+ CPPFLAGS += -E
+-OMPFLAGS =
++#OMPFLAGS =
+ # gcc with OpenMP
+-#OMPFLAGS = -fopenmp
++OMPFLAGS = -fopenmp
+ # gcc with OpenMP on 32-bit x86 with SSE2
+ #OMPFLAGS = -fopenmp -msse2
+ # Mac OS X (llvm-gcc) with OpenMP

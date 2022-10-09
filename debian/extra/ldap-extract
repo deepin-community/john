@@ -1,0 +1,60 @@
+#! /usr/bin/perl
+#
+# Script to extract passwords from an LDAP directory server
+# The script has to be called with:
+#
+# ldap-extract ldap://server baseDN AdminDN Adminpassword
+# 
+# This script requires the 'libnet-ldap-perl' package
+#
+# (c) 2004 Klaus Ethgen
+# Licensed under the GNU General Public License version 2.
+#
+# TODO
+# - The script will only retrieve passwords in crypt format
+#   other formats (MD5, SHA-1...) are not supported.
+                                                                                
+use strict;
+use warnings;
+use Getopt::Std;
+our($opt_h);
+getopts('h');
+if ( $opt_h || @ARGV != 4 ) {
+	print "Usage: $0 ldap://server baseDN AdminDN Adminpassword\n";
+	exit 1;
+}
+eval "use Net::LDAP";
+if ($@) {
+	print "ERROR: Could not load the Net::LDAP module\n";
+	print "(Hint: If you are running this in Debian install the libnet-ldap-perl package)\n";
+	exit 1;
+}
+                                                                                
+my ($host) = $ARGV[0] =~ /ldap:\/\/(.*)/;
+my $ldap = Net::LDAP->new("localhost") or die $@;
+$ldap->bind($ARGV[2], password => $ARGV[3], version => 3) or die "Cannot bind to ldap server $ARGV[2]: $!";
+my $res = $ldap->search(base => $ARGV[1], scope => "sub", attrs =>
+   [qw(cn uid userPassword loginShell homeDirectory uidNumber gidNumber)],filter => "cn=*");
+my $x = $res->as_struct;
+foreach (keys %$x)
+{
+   print $x->{$_}->{uid}->[0];
+   my $pw = $x->{$_}->{userpassword}->[0];
+   if ($pw =~ /^\{crypt\}(.*)$/)
+   {
+      $pw = $1;
+   }
+#   else
+#   {
+#      $pw =~ s/^\{.+\}/\$1\$/;
+#   }
+   print ":$pw";
+   foreach my $i (qw(uidnumber gidnumber cn homedirectory loginshell))
+   {
+      print ":", $x->{$_}->{$i}->[0];
+   }
+   print "\n";
+}
+$ldap->unbind;
+
+exit 0;

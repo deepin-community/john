@@ -1,0 +1,43 @@
+Source: john
+Section: admin
+Priority: optional
+Maintainer: Debian Security Tools <team+pkg-security@tracker.debian.org>
+Uploaders: Julián Moreno Patiño <julian@debian.org>,
+           Axel Beckert <abe@debian.org>
+Build-Depends: debhelper-compat (= 13),
+               dpkg-dev (>= 1.16.1~)
+Standards-Version: 4.5.1
+Homepage: http://www.openwall.com/john/
+Vcs-Browser: https://salsa.debian.org/pkg-security-team/john
+Vcs-Git: https://salsa.debian.org/pkg-security-team/john.git
+Rules-Requires-Root: no
+
+Package: john
+Architecture: any
+Depends: john-data (= ${source:Version}),
+         ${misc:Depends},
+         ${shlibs:Depends}
+Suggests: wordlist
+Description: active password cracking tool
+ John the Ripper is a tool designed to help systems administrators to
+ find weak (easy to guess or crack through brute force) passwords, and
+ even automatically mail users warning them about it, if it is desired.
+ .
+ Besides several crypt(3) password hash types most commonly found on
+ various Unix flavors, supported out of the box are Kerberos AFS and
+ Windows NT/2000/XP/2003 LM hashes, plus several more with contributed
+ patches.
+
+Package: john-data
+Architecture: all
+Enhances: john
+Depends: ${misc:Depends}
+Breaks: john (<= 1.7.2-1)
+Multi-Arch: foreign
+Description: active password cracking tool - character sets
+ John the Ripper is a tool designed to help systems administrators to
+ find weak (easy to guess or crack through brute force) passwords, and
+ even automatically mail users warning them about it, if it is desired.
+ .
+ This package contains architecture-independent character sets usable by
+ john.

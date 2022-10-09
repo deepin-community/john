@@ -1,0 +1,39 @@
+Description: adds c3_fmt.o to JOHN_OBJS in freebsd-* targets
+Author: Julián Moreno Patiño <julian@debian.org>
+Reviewed-By: Ruben Molina <rmolina@udea.edu.co>
+Last-Update: 2013-06-04
+Forwarded: no
+
+Index: john-1.8.0/src/Makefile
+===================================================================
+--- john-1.8.0.orig/src/Makefile	2013-06-04 01:19:38.876046194 -0500
++++ john-1.8.0/src/Makefile	2013-06-04 01:20:00.164046852 -0500
+@@ -308,24 +308,24 @@
+ freebsd-x86-64:
+ 	$(LN) x86-64.h arch.h
+ 	$(MAKE) $(PROJ) \
+-		JOHN_OBJS="$(JOHN_OBJS) x86-64.o"
++		JOHN_OBJS="$(JOHN_OBJS) c3_fmt.o x86-64.o"
+ 
+ freebsd-x86-sse2:
+ 	$(LN) x86-sse.h arch.h
+ 	$(MAKE) $(PROJ) \
+-		JOHN_OBJS="$(JOHN_OBJS) x86.o x86-sse.o" \
++		JOHN_OBJS="$(JOHN_OBJS) c3_fmt.o x86.o x86-sse.o" \
+ 		ASFLAGS="$(ASFLAGS) -DBSD"
+ 
+ freebsd-x86-mmx:
+ 	$(LN) x86-mmx.h arch.h
+ 	$(MAKE) $(PROJ) \
+-		JOHN_OBJS="$(JOHN_OBJS) x86.o x86-mmx.o" \
++		JOHN_OBJS="$(JOHN_OBJS) c3_fmt.o x86.o x86-mmx.o" \
+ 		ASFLAGS="$(ASFLAGS) -DBSD"
+ 
+ freebsd-x86-any:
+ 	$(LN) x86-any.h arch.h
+ 	$(MAKE) $(PROJ) \
+-		JOHN_OBJS="$(JOHN_OBJS) x86.o" \
++		JOHN_OBJS="$(JOHN_OBJS) c3_fmt.o x86.o" \
+ 		ASFLAGS="$(ASFLAGS) -DBSD"
+ 
+ freebsd-x86-any-a.out:

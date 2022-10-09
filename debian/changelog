@@ -1,0 +1,839 @@
+john (1.8.0-4) unstable; urgency=medium
+
+  * Also unconditionally and always call "mkdir -p $RUNDIR" in cron
+    job. (Really closes: #640288)
+    + Make sure that /var/lib/john/ and /var/run/john/ are removed again
+      on purge if empty.
+  * Adopt package under the Debian Security Tools Team. (Closes: #981055).
+    + Set Debian Security Tools <team+pkg-security@tracker.debian.org> as
+      Maintainer.
+    + Set Julián Moreno Patiño <julian@debian.org> and myself as Uploaders.
+    + Switch to DEP14-style branches and add a debian/gbp.conf.
+    + Update Vcs-* headers for moving to the pkg-security-team's repo.
+    + Create a debian/salsa-ci.yml file.
+
+ -- Axel Beckert <abe@debian.org>  Fri, 05 Feb 2021 04:59:29 +0100
+
+john (1.8.0-3) unstable; urgency=medium
+
+  * QA upload of recently orphaned package.
+  * Set Maintainer to Debian QA Group <packages@qa.debian.org>, removing
+    the Uploaders field. (See #981055, closes: #979054)
+  * Add Vcs-* headers and let them point to Salsa.
+  * Run "wrap-and-sort -a".
+  * Remove trailing whitespace from ancient debian/changelog entries and
+    in debian/rules. Thanks Lintian!
+  * Use secure copyright file specification URI.
+  * Use secure URI in debian/watch.
+  * Bump debhelper from deprecated 9 to 13.
+    + Pass --no-parallel to dh as john otherwise FTBFS.
+  * Set debhelper-compat version in Build-Depends.
+  * Enable all hardening flags.
+  * Set "Rules-Requires-Root: no".
+  * Bump debian/watch version from 3 to 4. Thanks Lintian!
+  * Declare compliance with Debian Policy 4.5.1.
+  * Update debian/watch to prefer .xz instead of .gz.
+  * Replace the no more usable GPGv1 upstream signing key with a minified
+    version of the Openwall offline signing key from
+    https://www.openwall.com/signatures/openwall-offline-signatures.asc
+  * Unconditionally and always call "mkdir -p $PIDDIR" in cron job. It's
+    idempotent anyways. (Closes: #502878, #640288)
+  * Enable OpenMP parallelization in upstream Makefile. (Closes: #824107)
+  * Mark john-data as "Multi-Arch: foreign" as suggested by the Multiarch
+    hinter.
+
+ -- Axel Beckert <abe@debian.org>  Tue, 26 Jan 2021 05:01:27 +0100
+
+john (1.8.0-2.1) unstable; urgency=medium
+
+  * Non maintainer upload by the Reproducible Builds team.
+  * No source change upload to rebuild on buildd with .buildinfo files.
+
+ -- Holger Levsen <holger@debian.org>  Fri, 01 Jan 2021 15:34:58 +0100
+
+john (1.8.0-2) unstable; urgency=medium
+
+  * Add myself to Uploaders. Thanks to Ruben Molina
+    for the permission.
+  * Add missing hardening fortify functions export.
+  * Bump Standards-Version to 3.9.5. (no changes).
+  * Add support to check upstream gpg signature.
+  * Add myself to debian copyright.
+
+ -- Julián Moreno Patiño <julian@debian.org>  Wed, 19 Mar 2014 15:37:37 -0500
+
+john (1.8.0-1) unstable; urgency=low
+
+  * New upstream release (Closes: #670582)
+  * Fixing $PIDDIR logic in crontab (Closes: #660822). Thanks Phil.
+  * Reefreshing patches
+  * Updating to Standards-Version 3.9.4 (no changes)
+  * Updating install scripts
+  * Updating debian/copyright for machine-readable format, version 1.0
+  * Updating compatibility level to 9
+  * Adding versioned Build-Depends on dpkg-dev (>= 1.16.1~)
+
+ -- Ruben Molina <rmolina@udea.edu.co>  Mon, 26 Nov 2012 14:35:38 -0500
+
+john (1.7.8-1) unstable; urgency=low
+
+  * New upstream release (Fix: CVE-2011-2483, LP: #805258)
+  * Fix john's manpage for debian file locations (Closes: #592401)
+
+ -- Ruben Molina <rmolina@udea.edu.co>  Mon, 04 Jul 2011 15:49:59 -0500
+
+john (1.7.7-2) unstable; urgency=low
+
+  * Forcing the 'generic' target for hurd
+  * Adding new escaping rules in order to solve FTBFS in armel, mips,
+    mipsel, and s390 (all using the 'generic' target)
+  * Updating copyright dates to 2011
+  * Removing unused patch: single-have_words-fix-1.diff
+
+ -- Ruben Molina <rmolina@udea.edu.co>  Wed, 15 Jun 2011 23:23:04 -0500
+
+john (1.7.7-1) unstable; urgency=low
+
+  * New upstream release (Closes: #585464, #563698, LP: #586544)
+  * Standards-Version bumped to 3.9.2 (no changes)
+  * Fully reworked debian/rules (Closes: #583367)
+    + New targets: *-kfreebsd, ia64, ppc*
+    + Generate optimized binaries (Closes: #629517)
+      + 64bits (amd64, kfreebsd-amd64)
+      + 32bits + sse2 (i386, kfreebsd-i386)
+    + Use CPU fallbacks (i386, freebsd-i386): sse2 → mmx → any
+      Delete debian/extra/john → no longer needed with CPU fallbacks
+  * Remove third-party patches (??-add_*.patches), making easier to
+    test new rules. Patches can be re-added later as needed.
+  * Remove some patches. Testing if they are still needed.
+    Some regresions are expectable: #420980, #460697, #415738.
+    Patches will be re-added as needed.
+  * Fix a spelling-error-in-manpage for john.8
+  * Update debian/watch in order to exclude jumbo patches.
+
+ -- Ruben Molina <rmolina@udea.edu.co>  Tue, 07 Jun 2011 08:09:28 -0500
+
+john (1.7.3.1-1) unstable; urgency=low
+
+  [David Paleino]
+  * New upstream release
+  * debian/man/john.8:
+    - updated the locations of john's session files (Closes: #360591)
+    - updated descriptions of --rules and --test (Closes: #485422)
+  * debian/extra/:
+    - john-mailer.conf and cronjob extended to allow per-group password
+      cracking -- thanks to Fabian Zeindl (LP: #194036)
+  * debian/patches/:
+    - 01-add_NTLM-MD4.patch,
+      02-add_MS-Credential-Cache.patch,
+      03-add_NetLM-NetNTLM.patch,
+      05-mipsel.patch,
+      07-update_FAQ.patch refreshed.
+    - 08-add_BFEgg.patch,
+      10-add_DOMINOSEC.patch,
+      11-add_lotus5.patch,
+      12-add_raw-md5.patch,
+      13-add_raw-sha1.patch,
+      14-add_IPB2.patch,
+      16-add_NSLDAP.patch,
+      17-add_OPENLDAPS.patch,
+      18-add_HDAA.patch added (from "Jumbo Patch" available on upstream's
+      homepage).
+    - series updated
+    - these will be the only patches added, in case of problems in future
+      some might be removed as well (Closes: #220005)
+  * debian/docs updated
+  * debian/copyright updated
+  * debian/watch updated
+  * debian/README.wordlists: typo fixed (Closes: #512158)
+  * debian/control:
+    - moved to git, updated Vcs-* fields
+    - updated Standards-Version to 3.8.0
+      + debian/README.source added
+    - DMUA set
+  * debian/man/john-mmx.8 added (Closes: #132223)
+
+  [Ruben Molina]
+  * New Maintainer
+  * Remove David Paleino from Uploaders as requested (Thanks for all!)
+  * Remove DM-Upload-Allowed bit
+  * Bump Standards-Version to 3.8.3 (no changes)
+  * Add headers to patches
+  * Add versioned references to licences on debian/copyright
+  * Improve debian/watch
+  * Add exec-stack.patch from Ubuntu to turn off executable stacks when
+    assembling (thanks Kees). Closes: #543451
+  * Avoid creation of /var/run/john (must be created dynamically, and is not
+    in use on current versions anyway). Fixed maintainer scripts according.
+    (Fix dir-or-file-in-var-run)
+
+ -- Ruben Molina <rmolina@udea.edu.co>  Sat, 17 Oct 2009 12:48:20 -0500
+
+john (1.7.2-3) unstable; urgency=low
+
+  * Merged debian/changelog from old experimental version (1.7-1 and
+    1.7-2).
+  * debian/patches/:
+    - 06-fix_paths.patch updated (Closes: #484109).
+    - 07-update_FAQ.patch added: point users to README.wordlists.
+    - added support for Microsoft Windows NT/2000/XP/2003 NTLM (MD4) hash
+      (patch by Alain Espinosa <alainesp at gmail dot com>)
+    - added support for Windows 2000/XP/2003 credentials cache hash (patch
+      by Alain Espinosa <alainesp at gmail dot com>)
+    - added support for LM/NTLMv1 challenge/response (ported from 1.7.0.2)
+      (patch by by JoMo-Kun <jmk at foofus dot net>)
+  * debian/control:
+    - set "John Packaging Team" as the Maintainer
+    - moved myself to Uploaders
+    - debhelper dependency bumped to >= 6.0.7~ (dh_lintian)
+    - added Build-Depends on libssl-dev
+  * debian/man/john.8 fixed (Closes: #482886)
+  * debian/rules updated:
+    - binary-common target added, binary-{arch,indep} depending on it
+      (Closes: #477450)
+    - conditionally unset OPT_NORMAL (i.e. remove -funroll-loops) on arm
+      machines
+  * debian/compat bumped to 6
+  * debian/copyright updated:
+    - included files created by patches
+
+ -- David Paleino <d.paleino@gmail.com>  Mon, 02 Jun 2008 17:21:00 +0200
+
+john (1.7.2-2) unstable; urgency=low
+
+  * Fixing undeclared conflict between john-data and previous versions
+    of john (Closes: #477974)
+
+ -- David Paleino <d.paleino@gmail.com>  Sat, 26 Apr 2008 09:48:09 +0200
+
+john (1.7.2-1) unstable; urgency=low
+
+  * Package adopted (Closes: #461992)
+  * New upstream release (Closes: #385858, #353151, #353108, #127920)
+  * debian/control:
+    - added Vcs-* fields
+    - updated Maintainer field
+    - dropped dependency on dpkg
+    - updated dependency on debhelper (>= 5)
+    - added dependency on quilt
+    - added an Arch: all package -- john-data
+  * debian/watch added
+  * debian/preinst - now invokes dpkg-query
+  * debian/man/john.8 - fixed errors from man
+  * debian/rules:
+    - refactored to use debhelper
+    - refactored to use quilt
+  * debian/README removed (no more applicable):
+    - also fixes dead symlink error (Closes: #354634, #372154)
+  * debian/john-data.install added:
+    - also includes alnum.chr in /usr/share/john/ (Closes: #385856)
+  * debian/patches/:
+    - bashisms.diff removed -- patching a debian/ file, no need to make a
+      separate patch.
+    - faq.diff removed -- the same info that the patch adds can be found in
+      README.wordlists.
+    - system-wide.diff removed -- john 1.7.* supports system-wide installation
+      via a compiler flag.
+    - all other old patches have been kept (but not applied at build-time) for
+      future reference.
+  * debian/copyright updated.
+  * debian/compat updated.
+
+ -- David Paleino <d.paleino@gmail.com>  Fri, 18 Apr 2008 17:24:58 +0200
+
+john (1.6-40.4) unstable; urgency=medium
+
+  * Non-maintainer upload.
+  * Add 'bashisms.diff' to fix bashisms in /usr/sbin/mailer script
+    (Closes: #468685)
+  * debian/control:
+    - Bump Standards-Version to 3.7.3.
+    - Use Homepage: field for upstream URL.
+
+ -- Chris Lamb <chris@chris-lamb.co.uk>  Sat, 12 Apr 2008 04:40:32 +0100
+
+john (1.6-40.3) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * Fixed build failure on !(i386 || alpha). Revert to the state of version
+    1.6-40.1, and used Ubuntu's sysconf-based patch instead of Thiemo's
+    CLOCKS_PER_SEC patch. Closes: #460697.
+  * Add debian/patches/mips.diff: patch from Thiemo Seufer to fix FTBFS on
+    mips and mipsel. Closes: #415738.
+
+ -- Lucas Nussbaum <lucas@lucas-nussbaum.net>  Mon, 14 Jan 2008 20:00:36 +0100
+
+john (1.6-40.2) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * Applied patch from Thiemo Seufer to replace CLK_TCK by CLOCKS_PER_SEC.
+    Fixes FTBFS (Closes: #420980).
+
+ -- Lucas Nussbaum <lucas@lucas-nussbaum.net>  Sat, 12 Jan 2008 22:11:08 +0100
+
+john (1.6-40.1) unstable; urgency=high
+
+  * Non-maintainer upload.
+  * High-urgency for RC bugfix.
+  * The following bug fixes are mostly cherry-picked from an omnibus patch
+    by Justin Pryzby <justinpryzby@users.sourceforge.net>:
+  * Complete rewrite of maintainer scripts to neither remove nor edit
+    conffiles (Closes: #375850)
+     - the debconf settings are not necessary for package operation,
+       so just don't use debconf, and remove debconf-related files from
+       debian directory (incidentally closes: #412797)
+     - preserves settings in preinst, rather than moving conffiles to
+       foo.old
+     - do the conffile relocation in preinst (not postinst, which
+       inhibits dpkg diffs when they should be displayed)
+     - the cronjob in /etc/cron.d does nothing if the executable isn't
+       +x, so doesn't need to be commented out on uninstallation
+     - minor edits to debian/README to reflect these changes
+  * Set /var/run/john to mode 0700 in postinst configure unless a
+    dpkg-statoverride exists (Closes: #403855)
+  * On uninstallation, remove restore file from /var/lib, not /usr/share;
+    and do so in postrm remove, not prerm remove.  On upgrade, if restore
+    file exists in /usr/share but not in /var/lib, move it in postinst.
+
+ -- Kevin B. McCarty <kmccarty@debian.org>  Wed, 14 Mar 2007 17:06:16 -0400
+
+john (1.6-40) unstable; urgency=low
+
+  * debian/control: updated my e-mail address.
+
+  * debian/preinst, debian/postinst, debian/postrm:
+    - reorganized the code
+    - added debhelper token
+  * debian/postrm:
+    - changed interpreter to /bin/sh
+  * debian/prerm:
+    - always remove temporary file. (Closes: #350423)
+
+ -- Guilherme de S. Pastore <gpastore@debian.org>  Tue, 18 Apr 2006 23:40:20 -0300
+
+john (1.7-2) experimental; urgency=low
+
+  * Patches changes:
+    - Drop the am64 patch (the AMD 64 bugs are fixed upstream and the patch
+      introduced new bugs)
+    - Drop the makefile patch (test code, should have been removed a long
+      time ago)
+    Neither are needed for these release any more
+  * Build changes:
+    - Use the MMX for i386 and amd64 and let john use the runtime fallback
+      if MMX is not present
+    - Introduce a build-john-stamp target in debian/rules to prevent cdbs from running the
+      build/john target twice (lead to FTBFS)
+  * Documentation changeS:
+    - Add doc/CONTACT to the documentation under debian/docs
+    - Added a debian/TODO
+    - Ofuscate the email addresses in the Debian manpages as
+      requested by Solar Designer
+    - Review the manpage and add double dashes to all options and equal
+      signs (GNU-style syntax). It still needs to be reviewed to adapt
+      it to 1.7...
+
+ -- Javier Fernandez-Sanguino Pen~a <jfs@computer.org>  Mon, 20 Feb 2006 18:10:28 +0100
+
+john (1.7-1) experimental; urgency=low
+
+  * New upstream release (Closes: #353151)
+  * Fix debian/copyright with information from doc/LICENSE, the
+    debian/copyright file said it was GPLv2 or later and the LICENSE
+    does not. Include other information from that file missing.
+  * Modify debian/patches/faq.diff since the fix is already applied
+    upstream
+  * Modify debian/patches/makefile.diff since the fix is carried upstesam
+  * Adjust debian/patches/systemwide.diff so that it uses the new SYSTEM_WIDE
+    definition
+  * Disable the MMX target for i386 (it does not work for the moment) and
+    use a single generic binary as with other architectures
+  * Create a link for /usr/share/john/john.conf that points to
+    /etc/john/john.conf (even though we have a systemwide configuration
+    pointing there, just in case)
+
+ -- Javier Fernandez-Sanguino Pen~a <jfs@computer.org>  Thu, 16 Feb 2006 14:53:36 +0100
+
+john (1.6-39) unstable; urgency=low
+
+  * debian/man/john.8:
+    - escape the apostrophe at the beginning of like 139.
+  * debian/extra/mailer:
+    - fixed configuration file parser in order to, among other things,
+      appropriately ignore comments (Closes: #340902)
+
+ -- Guilherme de S. Pastore <guilherme.pastore@terra.com.br>  Thu, 29 Dec 2005 10:21:25 -0200
+
+john (1.6-38) unstable; urgency=low
+
+  * debian/control:
+    - update to Standards-Version 3.6.2.1 with no changes
+  * debian/patches:
+    - faq.diff, makefile.diff, system-wide.diff: transformed changes made to
+      the source tree directly and stored in the .diff.gz file into patches,
+      so it's possible to maintain the package in an SVN repository
+  * debian/postinst:
+    - modify indentation
+    - remove $tmp if $cronfile doesn't exist (Closes: #332488)
+  * Updated Swedish debconf templates translation; thanks to
+    Daniel Nylander <yeager@lidkoping.net> (Closes: #334883)
+
+ -- Guilherme de S. Pastore <guilherme.pastore@terra.com.br>  Fri, 11 Nov 2005 22:39:25 -0200
+
+john (1.6-37) unstable; urgency=medium
+
+  * debian/control:
+    - updated maintainer's e-mail address
+  * debian/config, debian/postrm, debian/preinst:
+    - Removed bashisms
+  * debian/man/john.8:
+    - fixed typo, thanks to A Costa (Closes: #325683)
+  * debian/extra/john:
+    - remove the /proc existence check, which will make the script
+      simply fall back to john-any if MMX can't be checked for
+  * debian/copyright:
+    - cosmetic fixes
+    - updated FSF's address
+
+ -- Guilherme de S. Pastore <guilherme.pastore@terra.com.br>  Fri, 12 Aug 2005 17:36:04 -0300
+
+john (1.6-36) unstable; urgency=medium
+
+  * debian/control:
+    - added debconf-2.0 as alternative to debconf dependency
+  * debian/extra/john:
+    - run john-{any,mmx} with the same we've been given, so it
+      works with unshadow and friends (Closes: #322442)
+  * debian/rules:
+    - install john.conf with the right permissions
+    - append to binary-install/john instead of binary-post-install/john
+
+ -- Guilherme de S. Pastore <gpastore@colband.com.br>  Thu,  4 Aug 2005 14:11:07 -0300
+
+john (1.6-35) unstable; urgency=low
+
+  * Moved john-any and john-mmx to /usr/lib/john on i386, as the user
+    is not supposed (and won't be able) to run them directly
+  * Fix stupid usage of debian/john.install that broke a couple of things
+    in -34 (not uploaded to Debian, at least)
+  * debian/extra/john-mail.conf:
+    - Make it clear(er) that one shouldn't put the path to the system
+      password file in the passfile directive (Closes: #296766)
+
+ -- Guilherme de S. Pastore <gpastore@colband.com.br>  Sat, 30 Jul 2005 12:20:02 -0300
+
+john (1.6-34) unstable; urgency=low
+
+  * debian/control:
+    - Rewrote both short and long description
+    - Updated Standards-Version to 3.6.2 with no changes
+    - Christian Kurz is really MIA, as he stated he would be. Removed
+      him from Uploaders. Thanks for the great work!
+  * debian/docs:
+    - Move installation of doc/NEWS to john.install, so we don't have to
+      manually rename it in debian/rules
+  * debian/examples:
+    - Removed run/john.ini from the list, it's the configuration file
+  * debian/po:
+    - de.po, es.po: unfuzzied header
+    - pt_BR.po: converted from ISO-8859-1 to UTF-8
+    - vi.po: added Vietnamese translation from Clytie Siddall (Closes: #314258)
+  * debian/rules:
+    - General cleanups
+    - Don't strip files manually: dh_strip handles this
+    - Moved manpages installation to debian/john.manpages
+    - Don't include cdbs's buildcore.mk: it's included by debhelper.mk
+    - Properly use dpkg-architecture instead of dpkg --print-architecture
+    - Added /var/run/john to DEB_FIXPERMS_EXCLUDE: the location needs to
+      be safe from normal user reading
+    - Symlinks are now handled within debian/john.links, and always point
+      to /usr/sbin/john, as the script should handle non-MMX machines
+  * debian/README.wordlists:
+    - Rewritten from scratch for better language
+    - Removed references to non-free costly word lists
+
+ -- Guilherme de S. Pastore <gpastore@colband.com.br>  Mon, 18 Jul 2005 13:27:24 -0300
+
+john (1.6-33) unstable; urgency=medium
+
+  * Fixed cronjob so that it doesn't send empty e-mails when no
+    password is cracked (Closes: #272065)
+  * Debconf templates:
+    - Updated Czech translation from Miroslav Kure (Closes: #273839)
+    - Updated Brazilian Portuguese translation from Tiago Vaz (Closes: #272432)
+
+ -- Guilherme de S. Pastore <gpastore@colband.com.br>  Fri, 19 Nov 2004 21:09:15 -0200
+
+john (1.6-32) unstable; urgency=medium
+
+  * Fix "errors" displayed to user during purge (Closes: #268938)
+  * Debconf templates:
+    - Added Turkish translation from Recai Oktas (Closes: #269518)
+    - Updated Japanese translation from Hideki Yamane (Closes: #269530)
+    - Updated Dutch translation from Frans Pop (Closes: #269825)
+    - Updated German translation from Florian Ernst (Closes: #271299)
+    - Updated French translation from Frédéric Zulian (Closes: 271433, 271440)
+  [ Javier Fernandez-Sanguino ]
+  * The cronjob will now echo the output of the mailer script so that
+    root gets a mail about easy passwords like it previously did
+
+ -- Guilherme de S. Pastore <gpastore@colband.com.br>  Sun, 12 Sep 2004 19:43:23 -0300
+
+john (1.6-31) unstable; urgency=low
+
+  * Added versioned dependency on dpkg >= 1.10.16, to have correct version
+    of start-stop-daemon and not wipe out system's /etc/shadow
+    (Closes: #266737)
+
+ -- Guilherme de S. Pastore <gpastore@colband.com.br>  Wed, 18 Aug 2004 22:56:17 -0300
+
+john (1.6-30) unstable; urgency=low
+
+  * Rewrote debconf templates (Closes: #259299)
+    - Added Danish translation from Claus Hindsgaul
+    - Added Russian translation from Yuri Kozlov
+  * Fixed handling of warning of "No configuration file" when upgrading
+    from a version that used the old path, /etc/john.ini (Closes: #259320)
+  [ Javier Fernandez-Sanguino ]
+  * Updated Spanish translation of debconf templates
+    - Revision by Rudy Godoy
+  * debian/extra/cronjob:
+    - Remove all comments before grepping and only use the first definition.
+      Supposedly closes: #262316
+
+ -- Guilherme de S. Pastore <gpastore@colband.com.br>  Wed, 14 Jul 2004 06:31:47 -0300
+
+john (1.6-29) unstable; urgency=high
+
+  * debian/extra/cronjob:
+    - Installed again with execution permitions (+x) (Closes: #259084)
+  * Fixes related to configuration files move from /etc to /etc/john:
+    - debian/man/john.8
+    - debian/extra/mailer (Closes: #259085)
+    - Debconf template and pt_BR translation
+  [ Javier Fernandez-Sanguino ]
+  * Minor typo fixes in the templates as suggested by Nicolas François in
+    #259191
+  * Unfuzzied spanish translations after revision.
+  * Added missing entries of previous version to the changelog
+  * Remove files under /var/run/john and /etc/john on purge
+
+ -- Guilherme de S. Pastore <gpastore@colband.com.br>  Mon, 12 Jul 2004 21:03:47 -0300
+
+john (1.6-28) unstable; urgency=medium
+
+  * Ported debian/rules to use CDBS
+    - Removed debian/conffiles, debhelper handles this
+    - Uses debian/dirs and others instead of polluting debian/rules
+    - Made cleanups and removed things that remained there from older
+      releases, such as unnecessary directories
+  * Bumped Standards-Version to 3.6.1.1
+  * Moved manpages to section 8 (Closes: #252206)
+  - Fixed problems (Closes: #252506)
+  * Re-added sparc support with generic target (Closes: #220928)
+  * Added real alternative to suggestion on wordlist
+  * Removed lintian/linda overrides, don't need them anymore
+  * Moved configuration files to /etc/john/ (Closes: #141741, #229597)
+  * Only check for configuration file in config if it's an upgrade
+    (Closes: #251227, #253194)
+  * Added patch from Goswin von Brederlow to avoid segfaults when
+    casting signed char to unsigned int on amd64 (Closes: #251095)
+  * Added clarification to the manpage about having to run john with
+    -show from the same directory where the password was cracked, so
+    that it works (Closes: #228750)
+  [ Javier Fernandez-Sanguino ]
+  * Build on all architectures Debian supports, using the 'generic'
+    target for the ones not supported by john (Closes: #138689, #224883)
+  * Major rewrite of the cronjob which will now work as follows:
+    - Mailer uses the latest password file to avoid mailing users warning
+      about passwords if they have changed it (Closes: #251172)
+    - Stale files are now removed under some circunstances (so /var/run/john
+      does not fill up with cronpasswd files)
+    - John is started/stopped using start-stop-daemon which makes it
+      write the pid file properly (unlike previously). Also,
+      the start-stop-daemon usage makes it possible to run john as a
+      non-root user (if everything is 'chowned' to him).
+    - This new cronjob will now restore interrupted sessions correctly
+      (and uses the john.rec files) (Closes: #213164)
+
+ -- Guilherme de S. Pastore <gpastore@colband.com.br>  Thu, 27 May 2004 18:14:28 -0300
+
+john (1.6-27) unstable; urgency=low
+
+  * New maintainer
+  * Bumped Standards-Version to 3.6.1.0
+  * Removed Origin: field from debian/control
+  * Corrected typo on debian/man/mailer.1 (Closes: #249574)
+  * Added Czech translation provided by Miroslav Kure (Closes: #244363)
+  * Dropped Sparc support so that bug fixes can progress into testing.
+    This will remain until there is a proper fix for this issue.
+  [ Javier Fernandez-Sanguino ]
+  * Updated debian/po/fr.po with patch provided by Christian Perrier (merged
+    manually the changes since they are not using the latest version)
+    (Closes #229624)
+  * Updated the Spanish translation (debian/po/es.po)
+  * Added the ldap-extract script provided by Klaus Ethgen to the examples
+    (Closes: #226980)
+  * Nice John's cron job per default (nobody rejected this and seems
+    a reasonable request since john should be able to recover nicely)
+    (Closes: #228799)
+  * Fixed PID loop in the cronjob (Closes: #227323)
+  [ Christian Kurz]
+  *  Updated debian/po/pt_BR.po with patch provided by Andre Luis Lopes
+     (Closes: #228122)
+  *  Updated debian/po/ja.po with a patch provided by Hideki Yamane
+     (Closes: #235647)
+  *  Updated debian/po/de.po with a patch provided by Florian Ernst
+     (Closes: #244524)
+
+ -- Guilherme de S. Pastore <gpastore@colband.com.br>  Mon, 17 May 2004 22:39:21 -0300
+
+john (1.6-26) unstable; urgency=medium
+
+  * The "I should not forget to dupload stuff" Release.
+  [ Javier Fernandez-Sanguino ]
+  * Created a new template, and modified the config so it checks
+    whether john.ini exists or not (Closes: #226897)
+  * The default john.ini file is now included as an example (so the user can
+    use it for restoration of the config file)
+  * Added a proper charset to the de.po file.
+  * Updated the spanish po file.
+  [ Christian Kurz ]
+  * Updated debian/po/fr.po with patch provided by Christian Perrier (Closes: #227024)
+
+ -- Javier Fernandez-Sanguino Pen~a <jfs@computer.org>  Mon, 12 Jan 2004 20:29:35 +0100
+
+john (1.6-25) unstable; urgency=low
+
+  * The "I still have to submit the code to alioth... Merry Xmas!" Release
+  * Added debconf loading to prerm script, thanks to Bastian Kleineidam
+   (Closes: #224160)
+  * Removed debbugs call in debian/control (Closes: #220069)
+  * Added japanese translation provided by Hideki Yamane (Closes: #224182)
+  * Removed lintian/override creation from debian/rules (Closes: #223374)
+
+ -- Javier Fernandez-Sanguino Pen~a <jfs@computer.org>  Fri, 26 Dec 2003 14:22:11 +0100
+
+john (1.6-24) unstable; urgency=low
+
+  * When upgrading, do not ask to enable the cronjob if the user has
+  not chosen to replace it.
+
+ -- Javier Fernandez-Sanguino Pen~a <jfs@computer.org>  Mon, 17 Nov 2003 01:05:47 +0100
+
+john (1.6-23) unstable; urgency=low
+
+  * Fixed the cronjob in order to avoid mails with just
+  "Usage: /usr/sbin/mailer PASSWORD-FILE" since it seems that under
+  some circumstances the restoration of jobs does not work properly.
+  Also added usage line.
+  * Modified prerm script in order to deinstall the cronjob if the
+  user is removing the package and has enabled the cronjob (Closes: #220845)
+  * Also modified the cron.d file to only run the cronjob if the file
+  exists and is executable.
+
+ -- Javier Fernandez-Sanguino Pen~a <jfs@computer.org>  Fri, 14 Nov 2003 01:34:22 +0100
+
+john (1.6-22) unstable; urgency=low
+
+  * Really fixed src/Makefile (I should have noticed that sparc.h was
+    not being created) since it still fails to build in sparc.
+
+ -- Javier Fernandez-Sanguino Pen~a <jfs@computer.org>  Wed, 12 Nov 2003 17:36:35 +0100
+
+john (1.6-21) unstable; urgency=low
+
+  * Modified src/Makefile in an attempt to fix the sparc build (broken since
+    1.6-19)
+
+ -- Javier Fernandez-Sanguino Pen~a <jfs@computer.org>  Wed, 12 Nov 2003 11:15:04 +0100
+
+john (1.6-20) unstable; urgency=low
+
+  * New co-maintainer (myself) in an attempt to offload Christian
+    of some of work in this package.
+  * Fixed typos in debian/rules (Closes: #220013, #213154)
+  * Included some more information in the description as well as the
+    upstream location (Closes: #220008)
+  * Added template in order to allow for configuration of wordlists
+    by the user, as well as a README.wordlist document
+    (Closes: #159488, #123837, #220015)
+  * Recovered configuration note regarding cron jobs so john will now
+    properly enable/disable it if asked to (Closes: #220021)
+  * Included Spanish debconf translation (Closes: #220011)
+  * Recovered German translation of the cronjob and added a de.po file.
+  * Added Dutch debconf translation provided by Philippe Faes
+    (Closes: #211349)
+  * Added French debconf translation provided by Frederic Zulian
+    (Closes: #211540)
+  * Added author's name and updated email address in copyright.
+  * Creation of /var/run/john/ in order to use this location
+    for the temporary file in john-mail.conf (this is mode 0700 so that
+    even if the passwords are stored there the impact is reduced)
+
+ -- Javier Fernandez-Sanguino Pen~a <jfs@computer.org>  Mon, 10 Nov 2003 22:01:00 +0100
+
+john (1.6-19) unstable; urgency=low
+
+  * This release wouldn't have been possible without the help from Jeronimo
+    Pellegrini and Gergely Nagy. Both were a great help for me and so it's
+    only fair to credit them here and say a big "THANK YOU"!
+  * john will create now the files john.pot, john.ini and restore in the
+    directory where it was started from.
+  * Changed the unshadow.1 manpage as suggested by Colin Watson. This means
+    that one occurance of .br was replaced by .PP and an newline was added.
+    This will address the issue of the slightly broken unshadow manpage,
+    that has been reported as bug #142848.
+  * The manpage john.1 won't mention the non-existing john-ini.5 anymore. This
+    is going to fix the bug #122438.
+  * Integrated two patches from Jeronimo Pellegrini that are going to improve
+    the cronjob. Also thanks to Gergely Nagy for his help with devising and
+    developing the patches. This should address bug #162991.
+  * Also the whole setup and behaviour of the cronjob has been modified. This
+    should also fix the bug #118012 since the code has been changed.
+  * Updated the URL pointer in the FAQ. This should fix the bug report
+    #159580.
+  * Changed the wrong comment in the file /etc/john-mail.conf. This will fix
+    the bug #162599.
+  * Fixed the location of password.lst and the location of the files for the
+    incremental mode in /etc/john.ini. This will fix the bugreport #79831.
+  * Reworked support for translation of debconf messages. Now this package is
+    using po-debconf for this purpose.
+
+ -- Christian Kurz <shorty@debian.org>  Wed, 11 Dec 2002 22:17:09 +0100
+
+john (1.6-18) unstable; urgency=low
+
+  * Applied a patch from Jeronimo Pellegrini to remove the reference
+    to the unexisting john.ini(5) manpage. (Closes: #122438)
+  * Applied a fix from Ben Okopnik to the unshadow manpage.
+    (Closes: #142848)
+
+ -- Christian Kurz <shorty@debian.org>  Sun, 14 Apr 2002 23:33:09 +0200
+
+john (1.6-17) unstable; urgency=low
+
+  * Rewording of comments in config file. (Closes: #115556)
+    (Thanks to Martin F Krafft)
+  * Included hack to remove cronjob if needed. (Closes: #114835,#117034)
+
+ -- Christian Kurz <shorty@debian.org>  Sun, 14 Oct 2001 20:14:42 +0200
+
+john (1.6-16) unstable; urgency=low
+
+  * Integrated patch from Damyan Ivanov to fix unquoted sed
+    expressions. (Closes: #113557)
+
+ -- Christian Kurz <shorty@debian.org>  Wed, 26 Sep 2001 12:57:53 +0200
+
+john (1.6-15) unstable; urgency=low
+
+  * Fixed typo in debconf templates. (Closes: #112058,#113166)
+  * Should fix another problem with the lock-file. (Closes: #113332)
+
+ -- Christian Kurz <shorty@debian.org>  Wed, 12 Sep 2001 16:08:30 +0200
+
+john (1.6-14) unstable; urgency=low
+
+  * Added german debconf translation from Sebastian Feltel.
+    (Closes: #109980)
+  * Fixed two typos in the john.1 manpage, noted by Stephen Frost.
+  * Applied patch from Daniel Kobras to fix two oversights in the
+    cronjob script. (Closes: #110272)
+  * Applied patch from Jeronimo Pellegrini to fix some small problems
+    in the scripts. (Closes: #110957)
+
+ -- Christian Kurz <shorty@debian.org>  Sat, 25 Aug 2001 09:09:18 +0200
+
+john (1.6-13) unstable; urgency=low
+
+  * We'll gzip the example file, which is about 12k. But the other files
+    which are just 2-6k will be stay uncompressed, until some very good
+    reasons are presented to convince me. (Closes: #96650)
+  * Integration of Patch from Jeronimo Pellegrini to support the
+    installation and deinstallation of a cronjob. (Closes: #101970)
+
+ -- Christian Kurz <shorty@debian.org>  Thu, 12 Jul 2001 22:55:09 +0200
+
+john (1.6-12) unstable; urgency=low
+
+  * Now we finally added manpages for john which have been written by
+    Jordi Mallach and Jeronimo Pellegrini. (Closes: #62498)
+  * Applied a patch from Jeronimo Pellegrini to make the mailer script
+    more configurable. (Closes: #101968)
+
+ -- Christian Kurz <shorty@debian.org>  Sun, 20 May 2001 10:18:56 +0200
+
+john (1.6-11) unstable; urgency=low
+
+  * Fixed Symlinks for $ARCHITECURE != i386. (Closes: #92280)
+
+ -- Christian Kurz <shorty@debian.org>  Sat, 31 Mar 2001 18:34:42 +0200
+
+john (1.6-10) unstable; urgency=low
+
+  * Fixed the symlinks, since we didn't notice that we broke them with
+    the 1.6-8 release. Now, it should work fine again. (Closes: #91824)
+
+ -- Christian Kurz <shorty@debian.org>  Wed, 28 Mar 2001 08:22:18 +0200
+
+john (1.6-9) unstable; urgency=low
+
+  * Fixed the name of the override file for john and also it'
+    location. (Closes: #81218)
+
+ -- Christian Kurz <shorty@debian.org>  Sun, 25 Mar 2001 00:30:33 +0100
+
+john (1.6-8) unstable; urgency=low
+
+  * Fixed the startup script for john to correctly use bash.
+
+ -- Christian Kurz <shorty@debian.org>  Thu,  1 Mar 2001 20:00:13 +0100
+
+john (1.6-7) unstable; urgency=low
+
+  * Fixed a typo to build john also on Alpha (Closes: #83696)
+
+ -- Christian Kurz <shorty@debian.org>  Sat, 27 Jan 2001 09:13:13 +0100
+
+john (1.6-6) unstable; urgency=low
+
+  * Added sparc-fix from Solar Designer (Closes: #81756).
+  * Changed rules file to build two different versions of john, one with
+    mmx extensions, and one without.
+  * Added wrapper script to start john.
+
+ -- Christian Kurz <shorty@debian.org>  Fri, 12 Jan 2001 22:31:05 +0100
+
+john (1.6-5) unstable; urgency=low
+
+  * Moved overrides file to correct location (Closes: 81218).
+  * Added 3 lines to overrides file for the symlinks.
+
+ -- Christian Kurz <shorty@debian.org>  Thu,  4 Jan 2001 20:51:32 +0100
+
+john (1.6-4) unstable; urgency=low
+
+  * Hopefully I fixed now the logfile-path-bug.
+
+ -- Christian Kurz <shorty@debian.org>  Fri,  8 Dec 2000 22:26:26 +0100
+
+john (1.6-3) unstable; urgency=low
+
+  * Fixed pre-rm to allow removal of package (Closes: 74091).
+
+ -- Christian Kurz <shorty@debian.org>  Thu,  5 Oct 2000 21:55:51 +0200
+
+john (1.6-2) unstable; urgency=low
+
+  * Changed debian/rules to be faster and more portable.
+  * Fixed prerm-script to run only on purges.
+  * Fixed some pathes to better defaults.
+
+ -- Christian Kurz <shorty@getuid.com>  Mon, 15 May 2000 19:37:07 +0200
+
+john (1.6-1) unstable; urgency=low
+
+  * First Debian release.
+
+ -- Christian Kurz <shorty@debian.org>  Sat,  1 Apr 2000 12:23:57 +0200

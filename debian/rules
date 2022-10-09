@@ -1,0 +1,126 @@
+#!/usr/bin/make -f
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+# This has to be exported to make some magic below work.
+export DH_OPTIONS
+
+# Enable all hardening
+export DEB_BUILD_MAINT_OPTIONS=hardening=+all
+
+# This is for the target selection
+CPU := $(shell dpkg-architecture -qDEB_HOST_ARCH_CPU)
+OS := $(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
+
+# This is to add missing hardening fortify functions export
+CFLAGS += $(shell dpkg-buildflags --get CPPFLAGS)
+
+CFLAGS += -DJOHN_SYSTEMWIDE
+# See src/params.h
+
+ifeq ($(OS),kfreebsd)
+	# enabling crypt(3) for kfreebsd, there is a patch adding fmt_c3.o
+	CFLAGS += -DHAVE_CRYPT
+	LDFLAGS +=  -lcrypt
+	# as we will use $(OS)-x86-*, it must be named freebsd, not kfreebsd
+	OS := freebsd
+endif
+
+# arm FTBFS with -funroll-loops. Please see #476460
+ifneq ($(CPU),arm)
+	CFLAGS += -funroll-loops
+endif
+
+# selecting compilation target
+ifeq ($(OS),hurd)
+	TARGET := generic
+else ifeq ($(CPU),i386)
+	# targeting an unoptimized binary first
+	TARGET := $(OS)-x86-any
+	# enabling i386 fallbacks
+	CFLAGS += -DCPU_FALLBACK
+else ifeq ($(CPU),amd64)
+	TARGET := $(OS)-x86-64
+else ifeq ($(CPU),powerpc)
+	TARGET := linux-ppc32
+else ifeq ($(CPU),ppc64)
+	TARGET := linux-ppc64
+else ifeq ($(CPU),alpha)
+	TARGET := linux-alpha
+else ifeq ($(CPU),sparc)
+	TARGET := linux-sparc
+else ifeq ($(CPU),ia64)
+	TARGET := linux-ia64
+else
+	TARGET := generic
+endif
+
+# please take a look at:
+# https://buildd.debian.org/status/logs.php?pkg=john&ver=1.7.7-1
+ifeq ($(OS),freebsd)
+	# seems like freebsd targets don't like too much escaping
+	CFLAGS += -DJOHN_SYSTEMWIDE_EXEC=\"/usr/lib/john\"
+	CFLAGS += -DCFG_FULL_NAME=\"/etc/john/john.conf\"
+else ifeq ($(TARGET),generic)
+	# and it is just the same for generic targets:
+	# armel, hurd-i386, mips, mipsel, and s390
+	CFLAGS += -DJOHN_SYSTEMWIDE_EXEC=\"/usr/lib/john\"
+	CFLAGS += -DCFG_FULL_NAME=\"/etc/john/john.conf\"
+else
+	# but, we need a lot of escaping for:
+	# amd64, i386, ia64, powerpc, and sparc
+	CFLAGS += -DJOHN_SYSTEMWIDE_EXEC=\\\"/usr/lib/john\\\"
+	CFLAGS += -DCFG_FULL_NAME=\\\"/etc/john/john.conf\\\"
+endif
+
+# testing i386 for mmx instructions and sse2 extensions
+ifeq ($(CPU),i386)
+	ifneq ($(OS),hurd)
+		MMX := $(shell grep -c '^flags.* mmx' /proc/cpuinfo)
+		ifneq ($(MMX),0)
+			HAVEMMX := 1
+		endif
+		SSE := $(shell grep -c '^flags.* sse2' /proc/cpuinfo)
+		ifneq ($(SSE),0)
+			HAVESSE := 1
+		endif
+	endif
+endif
+
+%:
+	dh $@ --sourcedirectory=src --no-parallel
+
+override_dh_auto_build:
+	# building the selected target
+	dh_auto_build -- clean $(TARGET)
+ifeq ($(HAVEMMX),1)
+	# renaming the non-mmx binary
+	mv run/john run/john-non-mmx
+	# building i386-mmx optimized binary
+	dh_auto_build -- clean $(OS)-x86-mmx
+endif
+ifeq ($(HAVESSE),1)
+	# renaming the non-sse2 binary
+	mv run/john run/john-non-sse
+	# building i386-sse2 optimized binary
+	dh_auto_build -- clean $(OS)-x86-sse2
+endif
+
+override_dh_auto_install:
+	# install the selected target
+	dh_auto_install
+	# install fallbacks as needed
+ifeq ($(HAVEMMX),1)
+	dh_install run/john-non-mmx /usr/lib/john
+endif
+ifeq ($(HAVESSE),1)
+	dh_install run/john-non-sse /usr/lib/john
+endif
+
+override_dh_auto_clean:
+	dh_auto_clean
+	# script-not-executable
+	chmod +x debian/extra/cronjob
+
+override_dh_auto_test:

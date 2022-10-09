@@ -1,0 +1,32 @@
+Description: allows FLAGS modification from debian/rules
+Author: Ruben Molina <rmolina@udea.edu.co>
+Last-Update: 2013-06-04
+Forwarded: no
+
+Index: john-1.8.0/src/Makefile
+===================================================================
+--- john-1.8.0.orig/src/Makefile	2013-05-29 18:21:25.000000000 -0500
++++ john-1.8.0/src/Makefile	2013-06-04 01:17:22.272040456 -0500
+@@ -18,7 +18,7 @@
+ TR = tr
+ SED = sed
+ NULL = /dev/null
+-CPPFLAGS = -E
++CPPFLAGS += -E
+ OMPFLAGS =
+ # gcc with OpenMP
+ #OMPFLAGS = -fopenmp
+@@ -28,11 +28,11 @@
+ #OMPFLAGS = -fopenmp -D_FORTIFY_SOURCE=0
+ # Sun Studio with OpenMP (set the OMP_NUM_THREADS env var at runtime)
+ #OMPFLAGS = -xopenmp
+-CFLAGS = -c -Wall -Wdeclaration-after-statement -O2 -fomit-frame-pointer $(OMPFLAGS)
++CFLAGS += -c -Wall -Wdeclaration-after-statement -O2 -fomit-frame-pointer $(OMPFLAGS)
+ # CFLAGS for use on the main john.c file only
+ CFLAGS_MAIN = $(CFLAGS)
+ ASFLAGS = -c $(OMPFLAGS)
+-LDFLAGS = -s $(OMPFLAGS)
++LDFLAGS += -s $(OMPFLAGS)
+ OPT_NORMAL = -funroll-loops
+ # Remove the "-Os" if you're using an ancient version of gcc
+ OPT_INLINE = -Os -funroll-loops -finline-functions

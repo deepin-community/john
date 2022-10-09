@@ -1,0 +1,59 @@
+This version of john has two new conffiles for the mailer script:
+
+/etc/john/john-mail.conf
+-----------------------
+
+This is where you define the command used to send messages to users,
+and the shells to be ignored when sending the messages. A working
+example is already installed.
+
+You can set the shells to be ignored, for example:
+
+shells=-,/bin/false,/dev/null,/bin/sync,/usr/bin/falselogin
+
+The default is set to:
+
+shells=-,/bin/false,/dev/null,/bin/sync
+
+And you may set the command used to send the message (the message
+will be piped into this command):
+
+mailcmd=/usr/sbin/sendmail
+
+That is the default. If you use sendmail, or if your mailer provides
+a "sendmail" executable, you may use the above line.
+
+And if you want to pass extra arguments to your mailer, set
+mailargs:
+
+mailargs= ...
+
+The default is not to define mailargs.
+
+/etc/john/john-mail.msg
+-----------------------
+
+This is the message template to be sent to the user. In the message,
+the strings @LOGIN and @HOSTNAME will be substituted for the user's
+login and the host name.
+
+If you use sendmail as mail command, you may include the headers
+at the top of the template message, like this:
+
+
+=============================================================
+Subject: Gotcha!
+Cc: root
+
+Just cracked your password for account @LOGIN at @HOSTNAME.
+Please change it.
+
+John the Ripper.
+=============================================================
+
+You may also use some binary of yours as the mail command; then it
+will be called, and the template (with the variables already
+substituted) will be piped into it. This may be useful if you want
+to use complex logging (using a DBMS, for example), or if you
+want to automatically run scripts (that block the account,
+perhaps?)

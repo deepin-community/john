@@ -1,0 +1,6 @@
+debian/extra/cronjob		/usr/share/john/
+debian/extra/john-mail.conf	/etc/john/
+debian/extra/john-mail.msg	/etc/john/
+debian/extra/mailer		/usr/sbin/
+run/john			/usr/sbin/
+run/john.conf			/etc/john/

@@ -1,0 +1,44 @@
+.\"                                      Hey, EMACS: -*- nroff -*-
+.\"
+.\" mailer.8 is copyright 1999-2001 by
+.\" Jordi Mallach <jordi@debian.org>
+.\" This is free documentation, see the latest version of the GNU General
+.\" Public License for copying conditions. There is NO warranty.
+.TH MAILER 8 "June 03, 2004" john
+.\" Please adjust this date whenever revising the manpage.
+.SH NAME
+mailer \- script to warn users about their weak passwords
+.SH SYNOPSIS
+.B mailer
+\fIpassword-files\fP
+.SH DESCRIPTION
+This manual page documents briefly the
+.B mailer
+command, which is part of the john package.
+This manual page was written for the Debian GNU/Linux distribution
+because the original program does not have a manual page.
+\fBjohn\fP, better known as John the Ripper, is a tool to find weak
+passwords of users in a server.
+.br
+The \fBmailer\fP tool is useful to inform users which have been found to
+be using weak passwords by mail.
+.P
+You should edit the message mailer will send to the users, but remember to
+copy the script to a safe place before editing it, as it's
+generally a bad idea to modify things living in /usr.
+.SH SEE ALSO
+.BR john (8),
+.BR unafs (8),
+.BR unique (8),
+.BR unshadow (8).
+.PP
+The programs are documented fully by John's documentation,
+which should be available in \fI/usr/share/doc/john\fP or other
+location, depending on your system.
+.SH AUTHOR
+This manual page was written by Jordi Mallach <jordi@debian.org>,
+for the Debian GNU/Linux system (but may be used by others).
+.br
+John the Ripper and mailer were written by Solar Designer
+<solar@openwall.com>. The complete list of contributors can be found in
+the CREDITS file in the documentation directory.
