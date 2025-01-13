@@ -1,6 +1,6 @@
 /*
  * This file is part of John the Ripper password cracker,
- * Copyright (c) 1996-2013 by Solar Designer
+ * Copyright (c) 1996-2019 by Solar Designer
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted.
@@ -22,7 +22,7 @@
 /*
  * John's version number.
  */
-#define JOHN_VERSION			"1.8.0"
+#define JOHN_VERSION			"1.9.0"
 
 /*
  * Notes to packagers of John for *BSD "ports", Linux distributions, etc.:
@@ -135,11 +135,17 @@
 /*
  * File names.
  */
+#ifdef __DJGPP__
+#define CFG_FULL_NAME			"$JOHN/john.ini"
+#else
 #define CFG_FULL_NAME			"$JOHN/john.conf"
-#define CFG_ALT_NAME			"$JOHN/john.ini"
+#endif
 #if JOHN_SYSTEMWIDE
+#ifdef __DJGPP__
+#define CFG_PRIVATE_FULL_NAME		JOHN_PRIVATE_HOME "/john.ini"
+#else
 #define CFG_PRIVATE_FULL_NAME		JOHN_PRIVATE_HOME "/john.conf"
-#define CFG_PRIVATE_ALT_NAME		JOHN_PRIVATE_HOME "/john.ini"
+#endif
 #define POT_NAME			JOHN_PRIVATE_HOME "/john.pot"
 #define LOG_NAME			JOHN_PRIVATE_HOME "/john.log"
 #define RECOVERY_NAME			JOHN_PRIVATE_HOME "/john"
@@ -161,6 +167,7 @@
 #define SUBSECTION_WORDLIST		"Wordlist"
 #define SECTION_INC			"Incremental:"
 #define SECTION_EXT			"List.External:"
+#define SECTION_DEBUG			"Debug"
 
 /*
  * Number of different password hash table sizes.
@@ -179,15 +186,23 @@
 /*
  * Hash table sizes.  These may also be hardcoded into the hash functions.
  */
-#define SALT_HASH_LOG			12
+#define SALT_HASH_LOG			20
 #define SALT_HASH_SIZE			(1 << SALT_HASH_LOG)
-#define PASSWORD_HASH_SIZE_0		0x10
-#define PASSWORD_HASH_SIZE_1		0x100
-#define PASSWORD_HASH_SIZE_2		0x1000
-#define PASSWORD_HASH_SIZE_3		0x10000
-#define PASSWORD_HASH_SIZE_4		0x100000
-#define PASSWORD_HASH_SIZE_5		0x1000000
-#define PASSWORD_HASH_SIZE_6		0x8000000
+#define PASSWORD_HASH_SIZE_0		0x100
+#define PASSWORD_HASH_SIZE_1		0x1000
+#define PASSWORD_HASH_SIZE_2		0x10000
+#define PASSWORD_HASH_SIZE_3		0x100000
+#define PASSWORD_HASH_SIZE_4		0x1000000
+#define PASSWORD_HASH_SIZE_5		0x8000000
+#define PASSWORD_HASH_SIZE_6		0x40000000
+
+#define PH_MASK_0			(PASSWORD_HASH_SIZE_0 - 1)
+#define PH_MASK_1			(PASSWORD_HASH_SIZE_1 - 1)
+#define PH_MASK_2			(PASSWORD_HASH_SIZE_2 - 1)
+#define PH_MASK_3			(PASSWORD_HASH_SIZE_3 - 1)
+#define PH_MASK_4			(PASSWORD_HASH_SIZE_4 - 1)
+#define PH_MASK_5			(PASSWORD_HASH_SIZE_5 - 1)
+#define PH_MASK_6			(PASSWORD_HASH_SIZE_6 - 1)
 
 /*
  * Password hash table thresholds.  These are the counts of entries required
@@ -195,18 +210,18 @@
  * may be smaller as determined by PASSWORD_HASH_SHR.
  */
 #define PASSWORD_HASH_THRESHOLD_0	3
-#define PASSWORD_HASH_THRESHOLD_1	3
-#define PASSWORD_HASH_THRESHOLD_2	(PASSWORD_HASH_SIZE_1 / 25)
-#define PASSWORD_HASH_THRESHOLD_3	(PASSWORD_HASH_SIZE_2 / 20)
+#define PASSWORD_HASH_THRESHOLD_1	(PASSWORD_HASH_SIZE_0 / 25)
+#define PASSWORD_HASH_THRESHOLD_2	(PASSWORD_HASH_SIZE_1 / 20)
+#define PASSWORD_HASH_THRESHOLD_3	(PASSWORD_HASH_SIZE_2 / 10)
 #define PASSWORD_HASH_THRESHOLD_4	(PASSWORD_HASH_SIZE_3 / 10)
-#define PASSWORD_HASH_THRESHOLD_5	(PASSWORD_HASH_SIZE_4 / 15)
-#define PASSWORD_HASH_THRESHOLD_6	(PASSWORD_HASH_SIZE_5 / 5)
+#define PASSWORD_HASH_THRESHOLD_5	(PASSWORD_HASH_SIZE_4 / 10)
+#define PASSWORD_HASH_THRESHOLD_6	(PASSWORD_HASH_SIZE_5 / 35)
 
 /*
  * Tables of the above values.
  */
-extern int password_hash_sizes[PASSWORD_HASH_SIZES];
-extern int password_hash_thresholds[PASSWORD_HASH_SIZES];
+extern unsigned int password_hash_sizes[PASSWORD_HASH_SIZES];
+extern unsigned int password_hash_thresholds[PASSWORD_HASH_SIZES];
 
 /*
  * How much smaller should the hash tables be than bitmaps in terms of entry
@@ -215,12 +230,18 @@ extern int password_hash_thresholds[PASSWORD_HASH_SIZES];
  * 5 or 6 will make them the same size in bytes on systems with 32-bit or
  * 64-bit pointers, respectively.
  */
+#if ARCH_BITS >= 64
+/* Up to 128 MiB bitmap, 2 GiB hash table assuming 64-bit pointers */
 #define PASSWORD_HASH_SHR		2
+#else
+/* Up to 128 MiB bitmap, 512 MiB hash table assuming 32-bit pointers */
+#define PASSWORD_HASH_SHR		3
+#endif
 
 /*
  * Cracked password hash size, used while loading.
  */
-#define CRACKED_HASH_LOG		16
+#define CRACKED_HASH_LOG		21
 #define CRACKED_HASH_SIZE		(1 << CRACKED_HASH_LOG)
 
 /*
@@ -247,9 +268,14 @@ extern int password_hash_thresholds[PASSWORD_HASH_SIZES];
 /*
  * Hash and buffer sizes for unique.
  */
-#define UNIQUE_HASH_LOG			20
+#if ARCH_BITS >= 64
+#define UNIQUE_HASH_LOG			25
+#define UNIQUE_BUFFER_SIZE		0x80000000U
+#else
+#define UNIQUE_HASH_LOG			24
+#define UNIQUE_BUFFER_SIZE		0x40000000
+#endif
 #define UNIQUE_HASH_SIZE		(1 << UNIQUE_HASH_LOG)
-#define UNIQUE_BUFFER_SIZE		0x4000000
 
 /*
  * Maximum number of GECOS words per password to load.
@@ -262,6 +288,16 @@ extern int password_hash_thresholds[PASSWORD_HASH_SIZES];
  * hashes (since it could be too slow).
  */
 #define LDR_HASH_COLLISIONS_MAX		1000
+
+/*
+ * How many bitmap entries should the cracker prefetch at once.  Set this to 0
+ * to disable prefetching.
+ */
+#ifdef __SSE__
+#define CRK_PREFETCH			64
+#else
+#define CRK_PREFETCH			0
+#endif
 
 /*
  * Maximum number of GECOS words to try in pairs.
@@ -296,7 +332,7 @@ extern int password_hash_thresholds[PASSWORD_HASH_SIZES];
 /*
  * Maximum number of character ranges for rules.
  */
-#define RULE_RANGES_MAX			16
+#define RULE_RANGES_MAX			30
 
 /*
  * Buffer size for words while applying rules, should be at least as large
@@ -317,8 +353,8 @@ extern int password_hash_thresholds[PASSWORD_HASH_SIZES];
 /*
  * john.pot and log file buffer sizes, can be zero.
  */
-#define POT_BUFFER_SIZE			0x8000
-#define LOG_BUFFER_SIZE			0x8000
+#define POT_BUFFER_SIZE			0x100000
+#define LOG_BUFFER_SIZE			0x100000
 
 /*
  * Buffer size for path names.

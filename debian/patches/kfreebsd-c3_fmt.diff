@@ -4,11 +4,9 @@ Reviewed-By: Ruben Molina <rmolina@udea.edu.co>
 Last-Update: 2013-06-04
 Forwarded: no
 
-Index: john-1.8.0/src/Makefile
-===================================================================
---- john-1.8.0.orig/src/Makefile	2013-06-04 01:19:38.876046194 -0500
-+++ john-1.8.0/src/Makefile	2013-06-04 01:20:00.164046852 -0500
-@@ -308,24 +308,24 @@
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -406,24 +406,24 @@
  freebsd-x86-64:
  	$(LN) x86-64.h arch.h
  	$(MAKE) $(PROJ) \

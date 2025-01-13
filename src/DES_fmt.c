@@ -1,6 +1,6 @@
 /*
  * This file is part of John the Ripper password cracker,
- * Copyright (c) 1996-2001,2010-2012 by Solar Designer
+ * Copyright (c) 1996-2001,2010-2012,2017 by Solar Designer
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted.
@@ -8,6 +8,7 @@
  * There's ABSOLUTELY NO WARRANTY, express or implied.
  */
 
+#include <stdint.h>
 #include <string.h>
 
 #include "arch.h"
@@ -19,7 +20,7 @@
 #define FORMAT_NAME			"traditional crypt(3)"
 
 #define BENCHMARK_COMMENT		""
-#define BENCHMARK_LENGTH		0
+#define BENCHMARK_LENGTH		7
 
 #define PLAINTEXT_LENGTH		8
 #define CIPHERTEXT_LENGTH_1		13
@@ -40,8 +41,8 @@ static struct fmt_tests tests[] = {
 
 #define ALGORITHM_NAME			DES_BS_ALGORITHM_NAME
 
-#define BINARY_SIZE			sizeof(ARCH_WORD_32)
-#define BINARY_ALIGN			sizeof(ARCH_WORD_32)
+#define BINARY_SIZE			sizeof(uint32_t)
+#define BINARY_ALIGN			sizeof(uint32_t)
 #define SALT_SIZE			ARCH_SIZE
 #define SALT_ALIGN			ARCH_SIZE
 
@@ -149,37 +150,37 @@ static void *salt(char *ciphertext)
 
 static int binary_hash_0(void *binary)
 {
-	return *(ARCH_WORD_32 *)binary & 0xF;
+	return *(uint32_t *)binary & PH_MASK_0;
 }
 
 static int binary_hash_1(void *binary)
 {
-	return *(ARCH_WORD_32 *)binary & 0xFF;
+	return *(uint32_t *)binary & PH_MASK_1;
 }
 
 static int binary_hash_2(void *binary)
 {
-	return *(ARCH_WORD_32 *)binary & 0xFFF;
+	return *(uint32_t *)binary & PH_MASK_2;
 }
 
 static int binary_hash_3(void *binary)
 {
-	return *(ARCH_WORD_32 *)binary & 0xFFFF;
+	return *(uint32_t *)binary & PH_MASK_3;
 }
 
 static int binary_hash_4(void *binary)
 {
-	return *(ARCH_WORD_32 *)binary & 0xFFFFF;
+	return *(uint32_t *)binary & PH_MASK_4;
 }
 
 static int binary_hash_5(void *binary)
 {
-	return *(ARCH_WORD_32 *)binary & 0xFFFFFF;
+	return *(uint32_t *)binary & PH_MASK_5;
 }
 
 static int binary_hash_6(void *binary)
 {
-	return *(ARCH_WORD_32 *)binary & 0x7FFFFFF;
+	return *(uint32_t *)binary & PH_MASK_6;
 }
 
 #define get_hash_0 DES_bs_get_hash_0
@@ -209,7 +210,7 @@ static int crypt_all(int *pcount, struct db_salt *salt)
 
 static int cmp_one(void *binary, int index)
 {
-	return DES_bs_cmp_one((ARCH_WORD_32 *)binary, 32, index);
+	return DES_bs_cmp_one((uint32_t *)binary, 32, index);
 }
 
 static int cmp_exact(char *source, int index)
@@ -229,11 +230,7 @@ static int binary_hash_1(void *binary)
 	return DES_STD_HASH_1(*(ARCH_WORD *)binary);
 }
 
-static int binary_hash_2(void *binary)
-{
-	return DES_STD_HASH_2(*(ARCH_WORD *)binary);
-}
-
+#define binary_hash_2 NULL
 #define binary_hash_3 NULL
 #define binary_hash_4 NULL
 #define binary_hash_5 NULL
@@ -241,7 +238,10 @@ static int binary_hash_2(void *binary)
 
 static int get_hash_0(int index)
 {
-	return DES_STD_HASH_0(buffer[index].aligned.data.binary[0]);
+	ARCH_WORD binary;
+
+	binary = buffer[index].aligned.data.binary[0];
+	return DES_STD_HASH_0(binary);
 }
 
 static int get_hash_1(int index)
@@ -252,14 +252,7 @@ static int get_hash_1(int index)
 	return DES_STD_HASH_1(binary);
 }
 
-static int get_hash_2(int index)
-{
-	ARCH_WORD binary;
-
-	binary = buffer[index].aligned.data.binary[0];
-	return DES_STD_HASH_2(binary);
-}
-
+#define get_hash_2 NULL
 #define get_hash_3 NULL
 #define get_hash_4 NULL
 #define get_hash_5 NULL
@@ -267,7 +260,7 @@ static int get_hash_2(int index)
 
 static int salt_hash(void *salt)
 {
-	return DES_STD_HASH_2(*(ARCH_WORD *)salt) & (SALT_HASH_SIZE - 1);
+	return DES_STD_HASH_1(*(ARCH_WORD *)salt) & (SALT_HASH_SIZE - 1);
 }
 
 static void set_salt(void *salt)

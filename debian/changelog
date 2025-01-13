@@ -1,3 +1,30 @@
+john (1.9.0-2) unstable; urgency=medium
+
+  * Team upload.
+  * Restrict current testsuite to amd64 and i386 architectures as
+    --method=crypt and multialgorithm hash files are not supported
+    in all architectures.
+
+ -- Marcos Fouces <marcos@debian.org>  Sun, 14 Aug 2022 00:40:53 +0200
+
+john (1.9.0-1) unstable; urgency=medium
+
+  [ Marcos Fouces ]
+  * Team upload.
+  * New upstream version 1.9.0
+  * Rework patches for new upstream release.
+  * Remove acute accent in john.8 manual page.
+  * Conversion of 'CREDITS' file to utf-8 encoding.
+
+  [ Axel Beckert ]
+  * Salsa CI: Ignore a specific assembler line in blhc. Adding $CPPFLAGS
+    to it causes an unexpected FTBFS due to a missing file.
+
+  [ Jan Gru ]
+  * Add autopkgtests
+
+ -- Marcos Fouces <marcos@debian.org>  Sat, 06 Aug 2022 20:29:52 +0200
+
 john (1.8.0-4) unstable; urgency=medium
 
   * Also unconditionally and always call "mkdir -p $RUNDIR" in cron

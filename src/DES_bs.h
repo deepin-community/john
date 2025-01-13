@@ -1,6 +1,6 @@
 /*
  * This file is part of John the Ripper password cracker,
- * Copyright (c) 1996-2001,2005,2010-2012 by Solar Designer
+ * Copyright (c) 1996-2001,2005,2010-2012,2015,2017 by Solar Designer
  */
 
 /*
@@ -9,6 +9,8 @@
 
 #ifndef _JOHN_DES_BS_H
 #define _JOHN_DES_BS_H
+
+#include <stdint.h>
 
 #include "arch.h"
 #include "common.h"
@@ -78,7 +80,7 @@ typedef struct {
 #if defined(_OPENMP) && !DES_BS_ASM
 #define DES_bs_mt			1
 #define DES_bs_cpt			32
-#define DES_bs_mt_max			(DES_bs_cpt * 576)
+#define DES_bs_mt_max			(DES_bs_cpt * 1024)
 extern int DES_bs_min_kpc, DES_bs_max_kpc;
 extern int DES_bs_nt;
 extern DES_bs_combined *DES_bs_all_p;
@@ -112,7 +114,7 @@ extern DES_bs_combined *DES_bs_all_p;
 #else
 #define DES_bs_mt			0
 #define DES_bs_cpt			1
-extern DES_bs_combined DES_bs_all;
+extern DES_bs_combined CC_CACHE_ALIGN DES_bs_all;
 #define for_each_t(n)
 #define init_t()
 #endif
@@ -155,17 +157,17 @@ extern int DES_bs_crypt_LM(int *keys_count, struct db_salt *salt);
  * Converts an ASCII ciphertext to binary to be used with one of the
  * comparison functions.
  */
-extern ARCH_WORD_32 *DES_bs_get_binary(char *ciphertext);
+extern uint32_t *DES_bs_get_binary(char *ciphertext);
 
 /*
  * Similarly, for LM hashes.
  */
-extern ARCH_WORD_32 *DES_bs_get_binary_LM(char *ciphertext);
+extern uint32_t *DES_bs_get_binary_LM(char *ciphertext);
 
 /*
  * The reverse of DES_bs_get_binary_LM().
  */
-extern char *DES_bs_get_source_LM(ARCH_WORD_32 *raw);
+extern char *DES_bs_get_source_LM(uint32_t *raw);
 
 /*
  * Calculate a hash for a DES_bs_crypt*() output.
@@ -182,22 +184,22 @@ extern int DES_bs_get_hash_3(int index);
 extern int DES_bs_get_hash_4(int index);
 extern int DES_bs_get_hash_5(int index);
 extern int DES_bs_get_hash_6(int index);
+extern int DES_bs_get_hash_0t(int index);
 extern int DES_bs_get_hash_1t(int index);
 extern int DES_bs_get_hash_2t(int index);
 extern int DES_bs_get_hash_3t(int index);
 extern int DES_bs_get_hash_4t(int index);
 extern int DES_bs_get_hash_5t(int index);
-extern int DES_bs_get_hash_6t(int index);
 
 /*
  * Compares 32 bits of a given ciphertext against at least the first count of
  * the DES_bs_crypt*() outputs and returns zero if no matches detected.
  */
-extern int DES_bs_cmp_all(ARCH_WORD_32 *binary, int count);
+extern int DES_bs_cmp_all(uint32_t *binary, int count);
 
 /*
  * Compares count bits of a given ciphertext against one of the outputs.
  */
-extern int DES_bs_cmp_one(ARCH_WORD_32 *binary, int count, int index);
+extern int DES_bs_cmp_one(uint32_t *binary, int count, int index);
 
 #endif
