@@ -1,25 +1,20 @@
-Description: allows CFG_FULL_NAME/CFG_ALT_NAME modification from debian/rules
-Author: Kees Cook <kees@debian.org>
-Reviewed-By: Ruben Molina <rmolina@udea.edu.co>
-Last-Update: 2013-06-04
+Description: allows CFG_FULL_NAME/CFG_ALT_NAME modification from debian/rules. 
+Modified by Marcos Fouces to adjust to upstream release 1.9.0.
+Author: Kees Cook <kees@debian.org>, Marcos Fouces <marcos@debian.org>
+Last-Update: 2022-08-07
 Forwarded: no
 
-Index: john-1.8.0/src/params.h
-===================================================================
---- john-1.8.0.orig/src/params.h	2013-05-29 22:32:02.000000000 -0500
-+++ john-1.8.0/src/params.h	2013-06-04 01:20:08.292047105 -0500
-@@ -135,8 +135,12 @@
+--- a/src/params.h
++++ b/src/params.h
+@@ -135,11 +135,6 @@
  /*
   * File names.
   */
+-#ifdef __DJGPP__
+-#define CFG_FULL_NAME			"$JOHN/john.ini"
+-#else
 -#define CFG_FULL_NAME			"$JOHN/john.conf"
--#define CFG_ALT_NAME			"$JOHN/john.ini"
-+#ifndef CFG_FULL_NAME
-+#define CFG_FULL_NAME                   "$JOHN/john.conf"
-+#endif
-+#ifndef CFG_ALT_NAME
-+#define CFG_ALT_NAME                    "$JOHN/john.ini"
-+#endif
+-#endif
  #if JOHN_SYSTEMWIDE
- #define CFG_PRIVATE_FULL_NAME		JOHN_PRIVATE_HOME "/john.conf"
- #define CFG_PRIVATE_ALT_NAME		JOHN_PRIVATE_HOME "/john.ini"
+ #ifdef __DJGPP__
+ #define CFG_PRIVATE_FULL_NAME		JOHN_PRIVATE_HOME "/john.ini"

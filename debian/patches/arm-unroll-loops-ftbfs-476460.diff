@@ -6,11 +6,9 @@ Bug-Debian: http://bugs.debian.org/476460
 Last-Update: 2013-06-04
 Forwarded: no
 
-Index: john-1.8.0/src/Makefile
-===================================================================
---- john-1.8.0.orig/src/Makefile	2013-06-04 01:19:37.244046143 -0500
-+++ john-1.8.0/src/Makefile	2013-06-04 01:19:38.876046194 -0500
-@@ -33,7 +33,6 @@
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -35,7 +35,6 @@
  CFLAGS_MAIN = $(CFLAGS)
  ASFLAGS = -c $(OMPFLAGS)
  LDFLAGS += -s $(OMPFLAGS)

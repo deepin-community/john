@@ -1,6 +1,6 @@
 #
 # This file is part of John the Ripper password cracker,
-# Copyright (c) 1996-2013 by Solar Designer
+# Copyright (c) 1996-2015,2019 by Solar Designer
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted.
@@ -26,9 +26,11 @@ OMPFLAGS =
 #OMPFLAGS = -fopenmp -msse2
 # Mac OS X (llvm-gcc) with OpenMP
 #OMPFLAGS = -fopenmp -D_FORTIFY_SOURCE=0
+# icc with OpenMP
+#OMPFLAGS = -openmp
 # Sun Studio with OpenMP (set the OMP_NUM_THREADS env var at runtime)
 #OMPFLAGS = -xopenmp
-CFLAGS = -c -Wall -Wdeclaration-after-statement -O2 -fomit-frame-pointer $(OMPFLAGS)
+CFLAGS = -c -Wall -O2 -fomit-frame-pointer $(OMPFLAGS)
 # CFLAGS for use on the main john.c file only
 CFLAGS_MAIN = $(CFLAGS)
 ASFLAGS = -c $(OMPFLAGS)
@@ -48,7 +50,7 @@ JOHN_OBJS = \
 	dummy.o \
 	batch.o bench.o charset.o common.o compiler.o config.o cracker.o \
 	crc32.o external.o formats.o getopt.o idle.o inc.o john.o list.o \
-	loader.o logger.o math.o memory.o misc.o options.o params.o path.o \
+	loader.o logger.o memory.o misc.o options.o params.o path.o \
 	recovery.o rpp.o rules.o signals.o single.o status.o tty.o wordlist.o \
 	unshadow.o \
 	unafs.o \
@@ -74,7 +76,7 @@ BENCH_OBJS = \
 	DES_bs.o $(BENCH_DES_BS_OBJS_DEPEND) \
 	$(BENCH_MD5_OBJS_DEPEND) \
 	$(BENCH_BF_OBJS_DEPEND) \
-	bench.o best.o common.o config.o formats.o math.o memory.o miscnl.o \
+	bench.o best.o common.o config.o formats.o memory.o miscnl.o \
 	params.o path.o signals.o tty.o
 
 PROJ = ../run/john ../run/unshadow ../run/unafs ../run/unique
@@ -87,21 +89,31 @@ default:
 	@echo "To build John the Ripper, type:"
 	@echo "	make clean SYSTEM"
 	@echo "where SYSTEM can be one of the following:"
-	@echo "linux-x86-64-avx         Linux, x86-64 with AVX (2011+ Intel CPUs)"
-	@echo "linux-x86-64-xop         Linux, x86-64 with AVX and XOP (2011+ AMD CPUs)"
+	@echo "linux-x86-64-avx512      Linux, x86-64 with AVX-512 (some 2017+ Intel CPUs)"
+	@echo "linux-x86-64-avx2        Linux, x86-64 with AVX2 (some 2013+ Intel CPUs)"
+	@echo "linux-x86-64-xop         Linux, x86-64 with AVX and XOP (some AMD CPUs)"
+	@echo "linux-x86-64-avx         Linux, x86-64 with AVX (some 2011+ Intel CPUs)"
 	@echo "linux-x86-64             Linux, x86-64 with SSE2 (most common)"
 #	@echo "linux-x86-64-32-sse2     Linux, x86-64, 32-bit with SSE2"
 #	@echo "linux-x86-64-32-mmx      Linux, x86-64, 32-bit with MMX"
+#	@echo "linux-x86-64-32-any      Linux, x86-64, 32-bit"
+	@echo "linux-x86-avx512         Linux, x86 32-bit with AVX-512 (some 2017+ Intel CPUs)"
+	@echo "linux-x86-avx2           Linux, x86 32-bit with AVX2 (some 2013+ Intel CPUs)"
+	@echo "linux-x86-xop            Linux, x86 32-bit with AVX and XOP (some AMD CPUs)"
 	@echo "linux-x86-avx            Linux, x86 32-bit with AVX (2011+ Intel CPUs)"
-	@echo "linux-x86-xop            Linux, x86 32-bit with AVX and XOP (2011+ AMD CPUs)"
 	@echo "linux-x86-sse2           Linux, x86 32-bit with SSE2 (most common, if 32-bit)"
 	@echo "linux-x86-mmx            Linux, x86 32-bit with MMX (for old computers)"
 	@echo "linux-x86-any            Linux, x86 32-bit (for truly ancient computers)"
+	@echo "linux-mic                Linux, Intel MIC (first generation Xeon Phi)"
+	@echo "linux-arm64le            Linux, ARM 64-bit little-endian w/ASIMD (best)"
+	@echo "linux-arm32le-neon       Linux, ARM 32-bit little-endian w/NEON (best 32-bit)"
+	@echo "linux-arm32le            Linux, ARM 32-bit little-endian"
 	@echo "linux-alpha              Linux, Alpha"
+	@echo "linux-sparc64            Linux, SPARC 64-bit"
 	@echo "linux-sparc              Linux, SPARC 32-bit"
 	@echo "linux-ppc32-altivec      Linux, PowerPC w/AltiVec (best)"
 	@echo "linux-ppc32              Linux, PowerPC 32-bit"
-#	@echo "linux-ppc64-altivec      Linux, PowerPC 64-bit w/AltiVec"
+	@echo "linux-ppc64-altivec      Linux, PowerPC 64-bit w/AltiVec"
 	@echo "linux-ppc64              Linux, PowerPC 64-bit"
 	@echo "linux-ia64               Linux, IA-64"
 	@echo "freebsd-x86-64           FreeBSD, x86-64 with SSE2 (best)"
@@ -135,8 +147,6 @@ default:
 	@echo "solaris-x86-mmx-gcc      Solaris, x86 with MMX, gcc"
 	@echo "solaris-x86-any-cc       Solaris, x86, cc"
 	@echo "solaris-x86-any-gcc      Solaris, x86, gcc"
-	@echo "sco-x86-any-gcc          SCO, x86, gcc"
-	@echo "sco-x86-any-cc           SCO, x86, cc"
 	@echo "tru64-alpha              Tru64 (Digital UNIX, OSF/1), Alpha"
 	@echo "aix-ppc32                AIX, PowerPC 32-bit"
 	@echo "macosx-x86-64            Mac OS X 10.5+, Xcode 3.0+, x86-64 with SSE2 (best)"
@@ -161,13 +171,22 @@ default:
 	@echo "beos-x86-any             BeOS, x86"
 	@echo "generic                  Any other Unix-like system with gcc"
 
-linux-x86-64-avx:
+linux-x86-64-avx512:
 	$(LN) x86-64.h arch.h
 	$(MAKE) $(PROJ) \
 		JOHN_OBJS="$(JOHN_OBJS) c3_fmt.o x86-64.o" \
-		CFLAGS_MAIN="$(CFLAGS) -DJOHN_AVX -DHAVE_CRYPT" \
-		CFLAGS="$(CFLAGS) -mavx -DHAVE_CRYPT" \
-		ASFLAGS="$(ASFLAGS) -mavx" \
+		CFLAGS_MAIN="$(CFLAGS) -DJOHN_AVX512F -DHAVE_CRYPT" \
+		CFLAGS="$(CFLAGS) -mavx512f -DHAVE_CRYPT" \
+		ASFLAGS="$(ASFLAGS) -mavx512f" \
+		LDFLAGS="$(LDFLAGS) -lcrypt"
+
+linux-x86-64-avx2:
+	$(LN) x86-64.h arch.h
+	$(MAKE) $(PROJ) \
+		JOHN_OBJS="$(JOHN_OBJS) c3_fmt.o x86-64.o" \
+		CFLAGS_MAIN="$(CFLAGS) -DJOHN_AVX2 -DHAVE_CRYPT" \
+		CFLAGS="$(CFLAGS) -mavx2 -DHAVE_CRYPT" \
+		ASFLAGS="$(ASFLAGS) -mavx2" \
 		LDFLAGS="$(LDFLAGS) -lcrypt"
 
 linux-x86-64-xop:
@@ -179,6 +198,15 @@ linux-x86-64-xop:
 		ASFLAGS="$(ASFLAGS) -mxop" \
 		LDFLAGS="$(LDFLAGS) -lcrypt"
 
+linux-x86-64-avx:
+	$(LN) x86-64.h arch.h
+	$(MAKE) $(PROJ) \
+		JOHN_OBJS="$(JOHN_OBJS) c3_fmt.o x86-64.o" \
+		CFLAGS_MAIN="$(CFLAGS) -DJOHN_AVX -DHAVE_CRYPT" \
+		CFLAGS="$(CFLAGS) -mavx -DHAVE_CRYPT" \
+		ASFLAGS="$(ASFLAGS) -mavx" \
+		LDFLAGS="$(LDFLAGS) -lcrypt"
+
 linux-x86-64:
 	$(LN) x86-64.h arch.h
 	$(MAKE) $(PROJ) \
@@ -186,6 +214,11 @@ linux-x86-64:
 		CFLAGS="$(CFLAGS) -DHAVE_CRYPT" \
 		LDFLAGS="$(LDFLAGS) -lcrypt"
 
+# The linux-x86-64-32-* targets exist for testing of 32-bit builds on 64-bit
+# systems.  We don't dare to add -m32 to the corresponding pure 32-bit targets
+# in order for those to be usable with old gcc that doesn't recognize -m32.
+# We do include -m32 in linux-x86-avx and higher, which imply recent enough
+# gcc, so there's no need to have linux-x86-64-32-* counterparts to those.
 linux-x86-64-32-sse2:
 	$(LN) x86-sse.h arch.h
 	$(MAKE) $(PROJ) \
@@ -202,13 +235,30 @@ linux-x86-64-32-mmx:
 		ASFLAGS="$(ASFLAGS) -m32" \
 		LDFLAGS="$(LDFLAGS) -m32 -lcrypt"
 
-linux-x86-avx:
+linux-x86-64-32-any:
+	$(LN) x86-any.h arch.h
+	$(MAKE) $(PROJ) \
+		JOHN_OBJS="$(JOHN_OBJS) c3_fmt.o x86.o" \
+		CFLAGS="$(CFLAGS) -m32 -DHAVE_CRYPT" \
+		ASFLAGS="$(ASFLAGS) -m32" \
+		LDFLAGS="$(LDFLAGS) -m32 -lcrypt"
+
+linux-x86-avx512:
 	$(LN) x86-sse.h arch.h
 	$(MAKE) $(PROJ) \
 		JOHN_OBJS="$(JOHN_OBJS) c3_fmt.o x86.o" \
-		CFLAGS_MAIN="$(CFLAGS) -m32 -DJOHN_AVX -DHAVE_CRYPT" \
-		CFLAGS="$(CFLAGS) -m32 -mavx -DHAVE_CRYPT" \
-		ASFLAGS="$(ASFLAGS) -m32 -mavx" \
+		CFLAGS_MAIN="$(CFLAGS) -m32 -DJOHN_AVX512F -DHAVE_CRYPT" \
+		CFLAGS="$(CFLAGS) -m32 -mavx512f -DHAVE_CRYPT" \
+		ASFLAGS="$(ASFLAGS) -m32 -mavx512f" \
+		LDFLAGS="$(LDFLAGS) -m32 -lcrypt"
+
+linux-x86-avx2:
+	$(LN) x86-sse.h arch.h
+	$(MAKE) $(PROJ) \
+		JOHN_OBJS="$(JOHN_OBJS) c3_fmt.o x86.o" \
+		CFLAGS_MAIN="$(CFLAGS) -m32 -DJOHN_AVX2 -DHAVE_CRYPT" \
+		CFLAGS="$(CFLAGS) -m32 -mavx2 -DHAVE_CRYPT" \
+		ASFLAGS="$(ASFLAGS) -m32 -mavx2" \
 		LDFLAGS="$(LDFLAGS) -m32 -lcrypt"
 
 linux-x86-xop:
@@ -218,6 +268,15 @@ linux-x86-xop:
 		CFLAGS_MAIN="$(CFLAGS) -m32 -DJOHN_XOP -DHAVE_CRYPT" \
 		CFLAGS="$(CFLAGS) -m32 -mxop -DHAVE_CRYPT" \
 		ASFLAGS="$(ASFLAGS) -m32 -mxop" \
+		LDFLAGS="$(LDFLAGS) -m32 -lcrypt"
+
+linux-x86-avx:
+	$(LN) x86-sse.h arch.h
+	$(MAKE) $(PROJ) \
+		JOHN_OBJS="$(JOHN_OBJS) c3_fmt.o x86.o" \
+		CFLAGS_MAIN="$(CFLAGS) -m32 -DJOHN_AVX -DHAVE_CRYPT" \
+		CFLAGS="$(CFLAGS) -m32 -mavx -DHAVE_CRYPT" \
+		ASFLAGS="$(ASFLAGS) -m32 -mavx" \
 		LDFLAGS="$(LDFLAGS) -m32 -lcrypt"
 
 linux-x86-sse2:
@@ -241,6 +300,39 @@ linux-x86-any:
 		CFLAGS="$(CFLAGS) -DHAVE_CRYPT" \
 		LDFLAGS="$(LDFLAGS) -lcrypt"
 
+linux-mic:
+	$(LN) mic.h arch.h
+	$(MAKE) $(PROJ) \
+		JOHN_OBJS="$(JOHN_OBJS) c3_fmt.o" \
+		CC=icc \
+		CFLAGS="$(CFLAGS) -no-opt-prefetch -mmic -openmp -DHAVE_CRYPT" \
+		LDFLAGS="$(LDFLAGS) -mmic -openmp -lcrypt" \
+		OPT_INLINE="$(OPT_NORMAL) -finline-functions"
+	@echo "You'll likely need to scp Intel's OpenMP runtime library such as /opt/intel/*/compiler/lib/mic/libiomp?.so over to the target MIC cards and set LD_LIBRARY_PATH in order to run the produced john binary"
+
+linux-arm64le:
+	$(LN) arm64le.h arch.h
+	$(MAKE) $(PROJ) \
+		JOHN_OBJS="$(JOHN_OBJS) c3_fmt.o" \
+		CFLAGS="$(CFLAGS) -DHAVE_CRYPT" \
+		LDFLAGS="$(LDFLAGS) -lcrypt" \
+		OPT_INLINE="$(OPT_INLINE) -fno-strict-aliasing"
+
+linux-arm32le-neon:
+	$(LN) arm32le.h arch.h
+	$(MAKE) $(PROJ) \
+		JOHN_OBJS="$(JOHN_OBJS) c3_fmt.o" \
+		CFLAGS="$(CFLAGS) -mfpu=neon -DHAVE_CRYPT" \
+		LDFLAGS="$(LDFLAGS) -lcrypt" \
+		OPT_INLINE="$(OPT_INLINE) -fno-strict-aliasing"
+
+linux-arm32le:
+	$(LN) arm32le.h arch.h
+	$(MAKE) $(PROJ) \
+		JOHN_OBJS="$(JOHN_OBJS) c3_fmt.o" \
+		CFLAGS="$(CFLAGS) -DHAVE_CRYPT" \
+		LDFLAGS="$(LDFLAGS) -lcrypt"
+
 linux-alpha:
 	$(LN) alpha.h arch.h
 	$(MAKE) $(PROJ) \
@@ -260,6 +352,13 @@ linux-alpha-ccc:
 		OPT_NORMAL="-fast" \
 		OPT_INLINE="-O2 -arch host"
 
+linux-sparc64:
+	$(LN) sparc64.h arch.h
+	$(MAKE) $(PROJ) \
+		JOHN_OBJS="$(JOHN_OBJS) c3_fmt.o" \
+		CFLAGS="$(CFLAGS) -m64 -mcpu=ultrasparc -DHAVE_CRYPT" \
+		LDFLAGS="$(LDFLAGS) -m64 -lcrypt"
+
 linux-sparc:
 	$(LN) sparc32.h arch.h
 	$(MAKE) $(PROJ) \
@@ -273,7 +372,7 @@ linux-ppc32-altivec:
 		JOHN_OBJS="$(JOHN_OBJS) c3_fmt.o" \
 		CFLAGS="$(CFLAGS) -DHAVE_CRYPT" \
 		LDFLAGS="$(LDFLAGS) -lcrypt" \
-		OPT_INLINE="-finline-functions -finline-limit=4000 -maltivec"
+		OPT_INLINE="-finline-functions -finline-limit=4000 -fno-strict-aliasing -maltivec"
 
 linux-ppc32:
 	$(LN) ppc32.h arch.h
@@ -282,14 +381,13 @@ linux-ppc32:
 		CFLAGS="$(CFLAGS) -DHAVE_CRYPT" \
 		LDFLAGS="$(LDFLAGS) -lcrypt"
 
-# This is slightly slower than linux-ppc32-altivec for most hash types.
 linux-ppc64-altivec:
 	$(LN) ppc64alt.h arch.h
 	$(MAKE) $(PROJ) \
 		JOHN_OBJS="$(JOHN_OBJS) c3_fmt.o" \
 		CFLAGS="$(CFLAGS) -m64 -DHAVE_CRYPT" \
 		LDFLAGS="$(LDFLAGS) -m64 -lcrypt" \
-		OPT_INLINE="-finline-functions -finline-limit=4000 -maltivec"
+		OPT_INLINE="-finline-functions -finline-limit=4000 -fno-strict-aliasing -maltivec"
 
 linux-ppc64:
 	$(LN) ppc64.h arch.h
@@ -541,32 +639,6 @@ solaris-x86-any-gcc:
 solaris-x86.o: x86.S
 	$(CPP) $(CPPFLAGS) -P -DDUMBAS x86.S | $(TR) \; \\n > tmp.s
 	$(AS) $(ASFLAGS) tmp.s -o solaris-x86.o
-	$(RM) tmp.s
-
-sco-x86-any-gcc:
-	$(RM) arch.h
-	ln -s x86-any.h arch.h
-	$(MAKE) $(PROJ) \
-		SHELL=/bin/sh \
-		JOHN_OBJS="$(JOHN_OBJS) sco-x86.o"
-
-sco-x86-any-cc:
-	$(RM) arch.h
-	ln -s x86-any.h arch.h
-	$(MAKE) $(PROJ) \
-		SHELL=/bin/sh \
-		JOHN_OBJS="$(JOHN_OBJS) sco-x86.o" \
-		CC=cc \
-		CFLAGS="-c -b elf -O3" \
-		ASFLAGS="-c -b elf" \
-		OPT_NORMAL="-K loop_unroll,no_inline" \
-		OPT_INLINE="-K inline"
-
-# SCO is even worse than Solaris x86
-sco-x86.o: x86.S
-	$(CPP) $(CPPFLAGS) -DDUMBAS x86.S | \
-		$(TR) \; \\n | $(SED) 's/\([%.]\) /\1/g' > tmp.s
-	$(AS) $(ASFLAGS) tmp.s -o sco-x86.o
 	$(RM) tmp.s
 
 tru64-alpha:
@@ -883,7 +955,7 @@ john.com: john.asm
 	strip ../run/unique.exe
 
 # Inlining the S-boxes produces faster code as long as they fit in the cache.
-DES_bs_b.o: DES_bs_b.c sboxes.c nonstd.c sboxes-s.c
+DES_bs_b.o: DES_bs_b.c sboxes.c nonstd.c sboxes-s.c sboxes-t.c
 	$(CC) $(CFLAGS) $(OPT_INLINE) DES_bs_b.c
 
 miscnl.o: misc.c

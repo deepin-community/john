@@ -1,6 +1,6 @@
 /*
  * This file is part of John the Ripper password cracker,
- * Copyright (c) 1996-2001,2008,2010-2012 by Solar Designer
+ * Copyright (c) 1996-2001,2008,2010-2012,2017 by Solar Designer
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted.
@@ -20,7 +20,7 @@
 #define FORMAT_NAME			""
 
 #define BENCHMARK_COMMENT		""
-#define BENCHMARK_LENGTH		-1
+#define BENCHMARK_LENGTH		0x107
 
 #define PLAINTEXT_LENGTH		15
 #define CIPHERTEXT_LENGTH		22
@@ -35,6 +35,7 @@
 
 static struct fmt_tests tests[] = {
 	{"$1$12345678$aIccj83HRDBo6ux1bVx7D1", "0123456789ABCDE"},
+	{"$1$7Uu2iTBB$Y4hQl2WvrOA3LBbLDxbAf0", "12345"},
 	{"$apr1$Q6ZYh...$RV6ft2bZ8j.NGrxLYaJt9.", "test"},
 	{"$1$12345678$f8QoJuo0DpBRfQSD0vglc1", "12345678"},
 	{"$1$$qRPK7m23GJusamGpoGLby/", ""},
@@ -91,79 +92,79 @@ static int valid(char *ciphertext, struct fmt_main *self)
 
 static int binary_hash_0(void *binary)
 {
-	return *(MD5_word *)binary & 0xF;
+	return *(MD5_word *)binary & PH_MASK_0;
 }
 
 static int binary_hash_1(void *binary)
 {
-	return *(MD5_word *)binary & 0xFF;
+	return *(MD5_word *)binary & PH_MASK_1;
 }
 
 static int binary_hash_2(void *binary)
 {
-	return *(MD5_word *)binary & 0xFFF;
+	return *(MD5_word *)binary & PH_MASK_2;
 }
 
 static int binary_hash_3(void *binary)
 {
-	return *(MD5_word *)binary & 0xFFFF;
+	return *(MD5_word *)binary & PH_MASK_3;
 }
 
 static int binary_hash_4(void *binary)
 {
-	return *(MD5_word *)binary & 0xFFFFF;
+	return *(MD5_word *)binary & PH_MASK_4;
 }
 
 static int binary_hash_5(void *binary)
 {
-	return *(MD5_word *)binary & 0xFFFFFF;
+	return *(MD5_word *)binary & PH_MASK_5;
 }
 
 static int binary_hash_6(void *binary)
 {
-	return *(MD5_word *)binary & 0x7FFFFFF;
+	return *(MD5_word *)binary & PH_MASK_6;
 }
 
 static int get_hash_0(int index)
 {
 	init_t();
-	return MD5_out[index][0] & 0xF;
+	return MD5_out[index][0] & PH_MASK_0;
 }
 
 static int get_hash_1(int index)
 {
 	init_t();
-	return MD5_out[index][0] & 0xFF;
+	return MD5_out[index][0] & PH_MASK_1;
 }
 
 static int get_hash_2(int index)
 {
 	init_t();
-	return MD5_out[index][0] & 0xFFF;
+	return MD5_out[index][0] & PH_MASK_2;
 }
 
 static int get_hash_3(int index)
 {
 	init_t();
-	return MD5_out[index][0] & 0xFFFF;
+	return MD5_out[index][0] & PH_MASK_3;
 }
 
 static int get_hash_4(int index)
 {
 	init_t();
-	return MD5_out[index][0] & 0xFFFFF;
+	return MD5_out[index][0] & PH_MASK_4;
 }
 
 static int get_hash_5(int index)
 {
 	init_t();
-	return MD5_out[index][0] & 0xFFFFFF;
+	return MD5_out[index][0] & PH_MASK_5;
 }
 
 static int get_hash_6(int index)
 {
 	init_t();
-	return MD5_out[index][0] & 0x7FFFFFF;
+	return MD5_out[index][0] & PH_MASK_6;
 }
 
 static int salt_hash(void *salt)

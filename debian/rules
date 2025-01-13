@@ -16,7 +16,7 @@ OS := $(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
 # This is to add missing hardening fortify functions export
 CFLAGS += $(shell dpkg-buildflags --get CPPFLAGS)
 
-CFLAGS += -DJOHN_SYSTEMWIDE
+CFLAGS += -DJOHN_SYSTEMWIDE=1
 # See src/params.h
 
 ifeq ($(OS),kfreebsd)
@@ -110,6 +110,10 @@ endif
 override_dh_auto_install:
 	# install the selected target
 	dh_auto_install
+	find . -name CREDITS -type f -exec \
+	iconv -f ISO-8859-1 -t UTF-8 '{}' -o '{}'.utf8 \; -exec \
+	mv -f '{}'.utf8 '{}' \;
+
 	# install fallbacks as needed
 ifeq ($(HAVEMMX),1)
 	dh_install run/john-non-mmx /usr/lib/john

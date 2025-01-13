@@ -1,5 +1,5 @@
+define-cfg-name.diff
 allow-cflags-overriding.diff
 arm-unroll-loops-ftbfs-476460.diff
 kfreebsd-c3_fmt.diff
-define-cfg-name.diff
 enable-openmp-support.diff

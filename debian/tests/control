@@ -1,0 +1,3 @@
+Tests: smoke, crack-crypt-with-wordlist, crack-std-formats-with-stdin
+Restrictions: needs-root, allow-stderr
+Architecture: amd64 i386

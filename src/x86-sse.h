@@ -1,6 +1,6 @@
 /*
  * This file is part of John the Ripper password cracker,
- * Copyright (c) 1996-2002,2005,2006,2008,2010,2011,2013 by Solar Designer
+ * Copyright (c) 1996-2002,2005,2006,2008,2010,2011,2013,2019 by Solar Designer
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted.
@@ -25,24 +25,6 @@
 #define ARCH_ALLOWS_UNALIGNED		1
 #define ARCH_INDEX(x)			((unsigned int)(unsigned char)(x))
 
-#define CPU_DETECT			1
-#define CPU_REQ				1
-#define CPU_NAME			"SSE2"
-#ifndef CPU_FALLBACK
-#define CPU_FALLBACK			0
-#endif
-#if CPU_FALLBACK && !defined(CPU_FALLBACK_BINARY)
-#define CPU_FALLBACK_BINARY		"john-non-sse"
-#define CPU_FALLBACK_BINARY_DEFAULT
-#endif
-
-#ifdef __XOP__
-#define JOHN_XOP
-#endif
-#if defined(__AVX__) || defined(JOHN_XOP)
-#define JOHN_AVX
-#endif
-
 #define DES_ASM				1
 #define DES_128K			0
 #define DES_X2				1
@@ -51,71 +33,86 @@
 #define DES_EXTB			0
 #define DES_COPY			1
 #define DES_STD_ALGORITHM_NAME		"DES 48/64 4K MMX"
+#define DES_BS_ASM			0
 #define DES_BS				1
+#define DES_BS_EXPAND			1
+
+#define CPU_DETECT			1
+#define CPU_REQ				1
+
+#ifdef __AVX512F__
+#define JOHN_AVX512F
+#elif defined(__AVX2__)
+#define JOHN_AVX2
+#elif defined(__XOP__)
+#define JOHN_XOP
+#elif defined(__AVX__)
+#define JOHN_AVX
+#endif
+
+#if defined(JOHN_AVX512F) || defined(JOHN_AVX2) || defined(JOHN_XOP)
+#define JOHN_AVX
+#endif
+
 #if defined(JOHN_AVX) && (defined(__GNUC__) || defined(_OPENMP))
 /*
- * Require gcc for AVX/XOP because DES_bs_all is aligned in a gcc-specific way,
- * except in OpenMP-enabled builds, where it's aligned by different means.
+ * Require gcc for non-OpenMP AVX+ builds, because DES_bs_all is aligned in a
+ * gcc-specific way in those.  (In non-OpenMP SSE2 builds, it's aligned in the
+ * assembly file.  In OpenMP builds, it's aligned by our runtime code.)
  */
 #define CPU_REQ_AVX
-#undef CPU_NAME
-#define CPU_NAME			"AVX"
-#ifdef CPU_FALLBACK_BINARY_DEFAULT
-#undef CPU_FALLBACK_BINARY
-#define CPU_FALLBACK_BINARY		"john-non-avx"
-#endif
-#define DES_BS_ASM			0
-#if 1
-#define DES_BS_VECTOR			8
-#if defined(JOHN_XOP) && defined(__GNUC__)
-/* Require gcc for 256-bit XOP because of __builtin_ia32_vpcmov_v8sf256() */
-#define CPU_REQ_XOP
-#undef CPU_NAME
-#define CPU_NAME			"XOP"
-#ifdef CPU_FALLBACK_BINARY_DEFAULT
-#undef CPU_FALLBACK_BINARY
-#define CPU_FALLBACK_BINARY		"john-non-xop"
-#endif
+#ifdef JOHN_AVX512F
+#define DES_BS_VECTOR			16
 #undef DES_BS
-#define DES_BS				3
-#define DES_BS_ALGORITHM_NAME		"DES 256/256 XOP"
-#else
-#define DES_BS_ALGORITHM_NAME		"DES 256/256 AVX"
-#endif
+#define DES_BS				4
+#define DES_BS_ALGORITHM_NAME		"DES 512/512 AVX512F"
+#define CPU_REQ_AVX512F
+#define CPU_NAME			"AVX512F"
+#define CPU_FALLBACK_BINARY_DEFAULT	"john-non-avx512"
+#elif defined(JOHN_AVX2)
+#define DES_BS_VECTOR			8
+#define DES_BS_ALGORITHM_NAME		"DES 256/256 AVX2"
+#define CPU_REQ_AVX2
+#define CPU_NAME			"AVX2"
+#define CPU_FALLBACK_BINARY_DEFAULT	"john-non-avx2"
 #else
 #define DES_BS_VECTOR			4
 #ifdef JOHN_XOP
 #undef DES_BS
 #define DES_BS				3
 #define DES_BS_ALGORITHM_NAME		"DES 128/128 XOP"
+#define CPU_REQ_XOP
+#define CPU_NAME			"XOP"
+#define CPU_FALLBACK_BINARY_DEFAULT	"john-non-xop"
 #else
 #define DES_BS_ALGORITHM_NAME		"DES 128/128 AVX"
+#define CPU_NAME			"AVX"
+#define CPU_FALLBACK_BINARY_DEFAULT	"john-non-avx"
 #endif
-#endif
-#elif defined(__SSE2__) && defined(_OPENMP)
-#define DES_BS_ASM			0
-#if 1
-#define DES_BS_VECTOR			4
-#define DES_BS_ALGORITHM_NAME		"DES 128/128 SSE2"
-#elif 0
-#define DES_BS_VECTOR			6
-#define DES_BS_VECTOR_SIZE		8
-#define DES_BS_ALGORITHM_NAME		"DES 128/128 SSE2 + 64/64 MMX"
-#elif 0
-#define DES_BS_VECTOR			5
-#define DES_BS_VECTOR_SIZE		8
-#define DES_BS_ALGORITHM_NAME		"DES 128/128 SSE2 + 32/32"
-#else
-#define DES_BS_VECTOR			7
-#define DES_BS_VECTOR_SIZE		8
-#define DES_BS_ALGORITHM_NAME		"DES 128/128 SSE2 + 64/64 MMX + 32/32"
 #endif
 #else
+/* Not AVX+ or non-gcc non-OpenMP */
+#ifndef _OPENMP
+#undef DES_BS_ASM
 #define DES_BS_ASM			1
+#endif
 #define DES_BS_VECTOR			4
 #define DES_BS_ALGORITHM_NAME		"DES 128/128 SSE2"
 #endif
-#define DES_BS_EXPAND			1
+
+#ifndef CPU_NAME
+#define CPU_NAME			"SSE2"
+#endif
+#ifndef CPU_FALLBACK_BINARY_DEFAULT
+#define CPU_FALLBACK_BINARY_DEFAULT	"john-non-sse"
+#endif
+
+#ifndef CPU_FALLBACK
+#define CPU_FALLBACK			0
+#endif
+#if !defined(CPU_FALLBACK_BINARY) && defined(CPU_FALLBACK_BINARY_DEFAULT)
+#define CPU_FALLBACK_BINARY		CPU_FALLBACK_BINARY_DEFAULT
+#endif
 
 #ifdef _OPENMP
 #define MD5_ASM				0

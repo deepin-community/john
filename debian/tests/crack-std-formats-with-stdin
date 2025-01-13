@@ -1,0 +1,52 @@
+#!/bin/sh
+
+# Exit on the first command fail
+set -e
+
+# Defines expected results
+EXPECTED=$(cat <<'EOF'
+user_sha-512:Debian
+user_sha-256:Debian
+user_sunmd5:Debian
+user_md5:Debian
+user_descrypt:Debian
+user_bsdicrypt:Debian
+user_nt:Debian
+EOF
+)
+
+# Defines hashes to crack
+HASHES=$(cat <<'EOF'
+user_yescrypt:$y$j85$8Az64q0npQQ3ebW/rMAI/1$58l5q0z1tvYHAwnn7U20eFrZWiCNECPMXROIoqsU1W2
+user_gost-yescrypt:$gy$j85$qWNNmIkIlg.RCQkB7.1t40$LGG/rXpEog2HUbyg.MLtzUOIhbJkfaKsTQK7ekgK2N4
+user_sha-512:$6$JJKKLLMM$q1XDHeP3sK5ZNmJc9PaKdvJMyimnEmDeU6ybTOAMhmrfZejaBAAKJk99v.ztGC3xJ2e3pQn7Ne/ugSHrGeV/U0
+user_sha-256:$5$IIJJKKLL$.aKwC3TsL1ssQqEOFSQ8i3A8JeYfs.ewGBrotVlMrG4
+user_sunmd5:$md5$rounds=2$AABBCCDD$6HXyDGrhiaPHoQAZLmgrF/
+user_md5:$1$EEFFGGHH$FPC7VX4nfLBmkjXlBJHMW1
+user_descrypt:AAPKdMk19oAEA
+user_nt:$3$$32cef4869babf377aabbe284f13465ac
+user_bsdicrypt:_J9..B74QVPVqrMjJx2M
+EOF
+)
+
+# Temporary hash file to use
+TMP="tmp_hashes"
+echo "$HASHES" > ${TMP}
+
+# Performs hash cracking by reading the wordlist from stdin
+echo "debian Debian" | xargs -n1 | john --stdin ${TMP}
+
+# Retrieves results
+ACTUAL=$(john --show $TMP)
+
+echo "${EXPECTED}" |
+    while read line
+    do
+	echo "${ACTUAL}" | grep -q ${line} 
+    done
+
+# Clean up, even if not needed in testbed
+rm ${TMP}
+
+# Exit success
+exit 0

@@ -39,6 +39,10 @@ Copyright: © 1999-2001, Jordi Mallach <jordi@debian.org>
            © 1999-2001, Jeronimo Pellegrini <pellegrini@mpcnet.com.br>
 License: GPL-2+
 
+Files: debian/tests/*
+Copyright: © 2021, Jan Gruber <j4n6ru@gmail.com>
+License: GPL-2+
+
 Files:src/MD5_std.*
 Copyright: © 1996-2006, Solar Designer <solar@openwall.com>
 License: GPL-2+

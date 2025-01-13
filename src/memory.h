@@ -1,6 +1,6 @@
 /*
  * This file is part of John the Ripper password cracker,
- * Copyright (c) 1996-98,2003,2010-2012 by Solar Designer
+ * Copyright (c) 1996-98,2003,2010-2012,2016 by Solar Designer
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted.
@@ -54,10 +54,18 @@
 extern unsigned int mem_saving_level;
 
 /*
- * Allocates size bytes and returns a pointer to the allocated memory.
+ * Allocates size bytes and returns a pointer to the allocated memory, or NULL
+ * if size is 0.
  * If an error occurs, the function does not return.
  */
 extern void *mem_alloc(size_t size);
+
+/*
+ * Allocates nmemb*size bytes using calloc(3) and returns a pointer to the
+ * allocated memory, or NULL if nmemb or/and size are 0.
+ * If an error occurs, the function does not return.
+ */
+extern void *mem_calloc(size_t nmemb, size_t size);
 
 /*
  * Frees memory allocated with mem_alloc() and sets the pointer to NULL.
@@ -80,11 +88,11 @@ extern void *mem_alloc_tiny(size_t size, size_t align);
 /*
  * Uses mem_alloc_tiny() to allocate the memory, and copies src in there.
  */
-extern void *mem_alloc_copy(void *src, size_t size, size_t align);
+extern void *mem_alloc_copy(const void *src, size_t size, size_t align);
 
 /*
  * Similar to the above function, but for ASCIIZ strings.
  */
-extern char *str_alloc_copy(char *src);
+extern char *str_alloc_copy(const char *src);
 
 #endif

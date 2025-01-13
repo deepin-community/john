@@ -1,0 +1,44 @@
+#!/bin/sh
+
+# Exit on the first command fail
+set -e
+
+# Defines expected results
+EXPECTED=$(cat <<'EOF'
+user_yescrypt:12345
+user_gost-yescrypt:password
+EOF
+)
+
+# Defines hashes to crack
+HASHES=$(cat <<'EOF'
+user_yescrypt:$y$j85$OGMIErbGNrEYiwnutN6HG0$PtiyyQc3fxPh8Ig0/GQhT7idvp9reiBI9x/Q0U6pAB/
+user_gost-yescrypt:$gy$j85$n3MaZu3hmSksDCUuQG3gs/$Hi2WJKbS6cz9cPAg.e9/uFq8Kwv/Vqc5g2SAFwNNWm5
+EOF
+)
+
+# Temporary hash file to use
+TMP="tmp_hashes"
+echo "$HASHES" > $TMP
+
+# Default wordlist installed with john
+DEFAULT="/usr/share/john/password.lst"
+
+# Performs hash cracking by reading the default wordlist 
+john --format=crypt --wordlist=${DEFAULT} ${TMP}
+
+# Retrieves results
+ACTUAL=$(john --show $TMP)
+
+echo "${EXPECTED}" |
+    while read line
+    do
+        echo "${ACTUAL}" | grep ${line} 	
+    done 
+
+# Clean up, even if not needed in testbed
+rm ${TMP}
+
+# Exit success
+exit 0
+
